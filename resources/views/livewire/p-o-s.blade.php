@@ -109,83 +109,103 @@
         </div>
 
 
-    <!-- Checkear carrito -->
-    <div class="flex-shrink-0 mt-6 space-y-4">
-        <div class="space-y-2">
-            <label for="cliente" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Cliente
-            </label>
+        <!-- Checkear carrito -->
+        <div class="flex-shrink-0 mt-6 space-y-4">
+            <div class="space-y-2">
+                <label for="cliente" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Cliente
+                </label>
 
-            <select wire:model="cliente_id" id="cliente"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
+                <select wire:model="cliente_id" id="cliente"
+                    class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
                    focus:border-blue-500 focus:ring-blue-500
                    dark:bg-neutral-900 dark:border-neutral-700
                    dark:text-neutral-400 dark:placeholder-neutral-500
                    dark:focus:ring-neutral-600">
-                <option value="">Seleccione un cliente</option>
-                @foreach ($clientes as $cliente)
-                    <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
-                @endforeach
-            </select>
-        </div>
+                    <option value="">Seleccione un cliente</option>
+                    @foreach ($clientes as $cliente)
+                        <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div class="mt-4">
-            <label for="descuento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Discount Amount
-            </label>
+            <div class="mt-4 flex items-center space-x-4">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Método de Pago:</span>
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" wire:model="metodo_pago" value="EFECTIVO" class="sr-only peer">
+                    <div
+                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-neutral-700 peer-checked:bg-green-500 transition">
+                    </div>
+                    {{--<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+                        @if ($metodo_pago === 'EFECTIVO')
+                            EFECTIVO
+                        @else
+                            A CREDITO
+                        @endif
+                    </span>--}}
+                </label>
+            </div>
 
-            <input wire:model.live.blur="valor_decuento" type="number" id="descuento" min="0"
-                placeholder="Enter descuento amount"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
+            <div class="mt-4">
+                <label for="descuento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Discount Amount
+                </label>
+
+                <input wire:model.live.blur="valor_decuento" type="number" id="descuento" min="0"
+                    placeholder="Enter descuento amount"
+                    class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
                focus:border-blue-500 focus:ring-blue-500
                dark:bg-neutral-900 dark:border-neutral-700
                dark:text-neutral-400 dark:placeholder-neutral-500
                dark:focus:ring-neutral-600">
+            </div>
+
+
+
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Subtotal:</span>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">
+                        COP {{ number_format(num: $this->subtotal, decimals: 2) }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Tax (15%):</span>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">
+                        COP {{ number_format(num: $this->tax, decimals: 2) }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Total before discount:</span>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">
+                        COP {{ number_format(num: $this->totalBeforeDiscount, decimals: 2) }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center mb-2 text-red-500 dark:text-red-400">
+                    <span class="text-sm font-semibold">Discount:</span>
+                    <span class="font-semibold">- COP
+                        {{ number_format(num: $this->valor_decuento, decimals: 2) }}</span>
+                </div>
+            </div>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Subtotal:</span>
-                <span class="font-medium text-gray-900 dark:text-gray-100">
-                    COP {{ number_format(num: $this->subtotal, decimals: 2) }}
-                </span>
-            </div>
-
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Tax (15%):</span>
-                <span class="font-medium text-gray-900 dark:text-gray-100">
-                    COP {{ number_format(num: $this->tax, decimals: 2) }}
-                </span>
-            </div>
-
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Total before discount:</span>
-                <span class="font-medium text-gray-900 dark:text-gray-100">
-                    COP {{ number_format(num: $this->totalBeforeDiscount, decimals: 2) }}
-                </span>
-            </div>
-
-            <div class="flex justify-between items-center mb-2 text-red-500 dark:text-red-400">
-                <span class="text-sm font-semibold">Discount:</span>
-                <span class="font-semibold">- COP {{ number_format(num: $this->valor_decuento, decimals: 2) }}</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="flex-shrink-0 mt-6">
-        <input wire:model.live.blur="paid_amount" type="number" min="0" placeholder="Amount Paid"
-            class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
+        <div class="flex-shrink-0 mt-6">
+            <input wire:model.live.blur="paid_amount" type="number" min="0" placeholder="Amount Paid"
+                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
                focus:border-blue-500 focus:ring-blue-500 mb-4
                dark:bg-neutral-900 dark:border-neutral-700
                dark:text-neutral-400 dark:placeholder-neutral-500
                dark:focus:ring-neutral-600" />
 
-        <button wire:click="checkout" wire:loading.attr="disabled"
-            class="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg
+            <button wire:click="checkout" wire:loading.attr="disabled"
+                class="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg
                transition-colors duration-200 hover:bg-green-700
                disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
-            Complete Sale
-        </button>
-    </div>
+                Complete Sale
+            </button>
+        </div>
     </div>
 </div>
