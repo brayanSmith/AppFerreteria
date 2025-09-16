@@ -37,6 +37,8 @@ class POS extends Component
     public $primer_comentario = '';
     public $segundo_comentario = '';
 
+    public $cantidad = 1;
+
     public function mount()
     {
         //cargar todos los productos
@@ -74,10 +76,10 @@ class POS extends Component
     public function change() {}
 
     // Agregar producto al carrito (comportamiento original)
-    public function addToCart($productoId)
+    public function addToCart($productoId, $cantidad = 2)
     {
-        $producto = Producto::find($productoId);
-        $inventario = Producto::find($productoId)->first();
+    $producto = Producto::find($productoId);
+    $inventario = Producto::find($productoId);
         if (!$inventario || $inventario->stock <= 0) {
             Notification::make()
                 ->title('Este Proucto esta fuera de Stock!')
@@ -87,15 +89,23 @@ class POS extends Component
         }
         if (isset($this->cart[$productoId])) {
             $currentQuantity = $this->cart[$productoId]['cantidad'];
-            if ($currentQuantity >= $inventario->stock) {
+            $nuevaCantidad = $currentQuantity + $cantidad;
+            if ($nuevaCantidad > $inventario->stock) {
                 Notification::make()
-                    ->title("No se pueden agregar mas productos. Solo {$inventario->stock} en stock")
+                    ->title("No se pueden agregar más productos. Solo {$inventario->stock} en stock")
                     ->danger()
                     ->send();
                 return;
             }
-            $this->cart[$productoId]['cantidad']++;
+            $this->cart[$productoId]['cantidad'] = $nuevaCantidad;
         } else {
+            if ($cantidad > $inventario->stock) {
+                Notification::make()
+                    ->title("No se pueden agregar más productos. Solo {$inventario->stock} en stock")
+                    ->danger()
+                    ->send();
+                return;
+            }
             $this->cart[$productoId]  = [
                 'id' => $producto->id,
                 'nombre_producto' => $producto->nombre_producto,
@@ -104,7 +114,7 @@ class POS extends Component
                 'valor_ferretero_producto' => $producto->valor_ferretero_producto,
                 'valor_mayorista_producto' => $producto->valor_mayorista_producto,
                 'imagen_producto' => $producto->imagen_producto,
-                'cantidad' => 1,
+                'cantidad' => $cantidad,
             ];
         }
     }

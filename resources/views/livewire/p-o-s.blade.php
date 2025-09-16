@@ -62,10 +62,22 @@
                             </p>
                         </div>
 
-                        <button wire:click="addToCart({{ $product->id }})"
-                            class="w-full py-3 bg-indigo-600 text-white font-bold transition hover:bg-indigo-700 rounded-b-2xl">
-                            Add to Cart
-                        </button>
+                        <div x-data="{ open: false, cantidad: 1 }">
+                            <button @click="open = true; cantidad = 1" class="w-full py-3 bg-indigo-600 text-white font-bold transition hover:bg-indigo-700 rounded-b-2xl">
+                                Add to Cart
+                            </button>
+                            <div x-show="open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+                                <div @click.away="open = false" class="bg-white dark:bg-neutral-800 rounded-lg shadow-2xl w-full max-w-xs p-6 relative">
+                                    <button @click="open = false" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white text-2xl">&times;</button>
+                                    <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Agregar al carrito</h3>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cantidad</label>
+                                        <input type="number" min="1" :max="{{ $product->stock ?? 1000 }}" x-model.number="cantidad" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100" />
+                                    </div>
+                                    <button @click="$wire.addToCart({{ $product->id }}, cantidad); open = false" class="w-full py-2 bg-indigo-600 text-white font-bold rounded-lg transition hover:bg-indigo-700">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @empty
                     <p class="col-span-full text-center text-gray-500 dark:text-gray-400 mt-8">
@@ -233,6 +245,29 @@
 
 
     </div>
-</div>
 
+
+    <flux:modal.trigger name="edit-profile">
+    <flux:button>Edit profile</flux:button>
+</flux:modal.trigger>
+
+<flux:modal name="edit-profile" variant="flyout">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Update profile</flux:heading>
+            <flux:text class="mt-2">Make changes to your personal details.</flux:text>
+        </div>
+
+        <flux:input label="Name" placeholder="Your name" />
+
+        <flux:input label="Date of birth" type="date" />
+
+        <div class="flex">
+            <flux:spacer />
+
+            <flux:button type="submit" variant="primary">Save changes</flux:button>
+        </div>
+    </div>
+</flux:modal>
+</div>
 
