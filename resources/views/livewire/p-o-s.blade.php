@@ -35,11 +35,14 @@
                         class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden
                                 transition-all duration-200 transform hover:scale-105 hover:shadow-xl">
 
+
                         <div class="p-4">
-                            <div
-                                class="w-full h-32 bg-gray-200 dark:bg-neutral-700 rounded-lg mb-3
-                                        flex items-center justify-center text-gray-500 dark:text-gray-400">
-                                <span class="text-sm">Item Image</span>
+                            <div class="w-full h-32 bg-gray-200 dark:bg-neutral-700 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                                @if($product->imagen_producto)
+                                    <img src="{{ asset('storage/' . $product->imagen_producto) }}" alt="{{ $product->nombre_producto }}" class="object-contain h-32 w-full" />
+                                @else
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Sin imagen</span>
+                                @endif
                             </div>
 
                             <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate">
@@ -49,7 +52,13 @@
                                 SKU: {{ $product->codigo_producto }}
                             </p>
                             <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">
-                                COP {{ number_format($product->valor_detal_producto, 2) }}
+                                DETAL: {{ number_format($product->valor_detal_producto, 2) }}
+                            </p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">
+                                FERRETERO: {{ number_format($product->valor_ferretero_producto, 2) }}
+                            </p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">
+                                MAYORISTA: {{ number_format($product->valor_mayorista_producto, 2) }}
                             </p>
                         </div>
 

@@ -122,6 +122,7 @@ class POS extends Component
                 'valor_detal_producto' => $producto->valor_detal_producto,
                 'valor_ferretero_producto' => $producto->valor_ferretero_producto,
                 'valor_mayorista_producto' => $producto->valor_mayorista_producto,
+                'imagen_producto' => $producto->imagen_producto,
                 'cantidad' => 1,
             ];
         }
