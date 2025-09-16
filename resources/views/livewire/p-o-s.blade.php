@@ -84,7 +84,7 @@
                             SKU: {{ $cartProduct['codigo_producto'] }}
                         </p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            COP {{ number_format($cartProduct['valor_detal_producto'], 2) }}
+                            COP {{ number_format($this->getPrecioProducto($cartProduct), 2) }}
                         </p>
                     </div>
 
@@ -129,22 +129,58 @@
                 </select>
             </div>
 
-            <div class="mt-4 flex items-center space-x-4">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Método de Pago:</span>
-                <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" wire:model="metodo_pago" value="EFECTIVO" class="sr-only peer">
-                    <div
-                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-neutral-700 peer-checked:bg-green-500 transition">
-                    </div>
-                    {{--<span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                        @if ($metodo_pago === 'EFECTIVO')
-                            EFECTIVO
-                        @else
-                            A CREDITO
-                        @endif
-                    </span>--}}
-                </label>
+            {{-- ...Metodo de Pago... --}}
+            <div class="mt-4">
+                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Método de Pago:</span>
+                <div class="flex space-x-2">
+                    <button type="button" wire:click="$set('metodo_pago', 'A CREDITO')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border
+                transition
+                {{ $metodo_pago === 'A CREDITO'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                        A CREDITO
+                    </button>
+                    <button type="button" wire:click="$set('metodo_pago', 'EFECTIVO')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border
+                transition
+                {{ $metodo_pago === 'EFECTIVO'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                        EFECTIVO
+                    </button>
+                </div>
             </div>
+            {{-- ...Tipo de Precio... --}}
+
+            <div class="mt-4">
+                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Precio:</span>
+                <div class="flex space-x-2">
+                    <button type="button" wire:click="$set('tipo_precio', 'FERRETERO')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border transition
+            {{ $tipo_precio === 'FERRETERO'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                        FERRETERO
+                    </button>
+                    <button type="button" wire:click="$set('tipo_precio', 'MAYORISTA')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border transition
+            {{ $tipo_precio === 'MAYORISTA'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                        MAYORISTA
+                    </button>
+                    <button type="button" wire:click="$set('tipo_precio', 'DETAL')"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border transition
+            {{ $tipo_precio === 'DETAL'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                        DETAL
+                    </button>
+                </div>
+            </div>
+
+
 
             <div class="mt-4">
                 <label for="descuento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -207,5 +243,10 @@
                 Complete Sale
             </button>
         </div>
+
+
+
     </div>
 </div>
+
+

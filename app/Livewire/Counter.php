@@ -2,10 +2,10 @@
 
 namespace App\Livewire;
 
-use Filament\Forms\Contracts\HasForms as Formee;
+use Filament\Forms\Contracts\HasForms;
 use Livewire\Component;
 
-class Counter extends Component implements Formee
+class Counter extends Component implements HasForms
 {
     public $count = 1;
 

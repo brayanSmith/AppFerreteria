@@ -13,8 +13,10 @@ use Livewire\Component;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
 
+
 class POS extends Component
 {
+
 
     //Propiedades
     public $productos;
@@ -26,6 +28,10 @@ class POS extends Component
     public $cliente_id = null;
     public $paid_amount = 0;
     public $valor_decuento = 0; //
+    public $metodo_pago = "A CREDITO";
+    public $tipo_precio = "DETAL";
+
+    public $valor_producto = 0;
 
     public function mount()
     {
@@ -50,18 +56,23 @@ class POS extends Component
                 || str_contains(strtolower($producto->codigo_producto), strtolower($this->search));
         });
     }
+
     #[Computed]
     public function subtotal()
     {
-        return collect($this->cart)->sum(fn($producto) => $producto['valor_detal_producto'] * $producto['cantidad']);
+        return collect($this->cart)->sum(function($producto) {
+            return $this->getPrecioProducto($producto) * $producto['cantidad'];
+        });
     }
 
     //placeholder para tax
+
     #[Computed]
     public function tax()
     {
         return $this->subtotal * 0.15;
     }
+
 
     #[Computed]
     public function totalBeforeDiscount()
@@ -69,21 +80,22 @@ class POS extends Component
         return $this->subtotal + $this->tax;
     }
 
+
     #[Computed]
     public function total()
     {
         $discountedTotal = $this->totalBeforeDiscount - $this->valor_decuento;
-
-        return $this->discountedTotal;
+        return $discountedTotal;
     }
+
 
     #[Computed]
     public function change() {}
 
+    // Agregar producto al carrito (comportamiento original)
     public function addToCart($productoId)
     {
         $producto = Producto::find($productoId);
-        //chequear stock
         $inventario = Producto::find($productoId)->first();
         if (!$inventario || $inventario->stock <= 0) {
             Notification::make()
@@ -93,7 +105,7 @@ class POS extends Component
             return;
         }
         if (isset($this->cart[$productoId])) {
-            $currentQuantity = $this->cart[$productoId]['stock'];
+            $currentQuantity = $this->cart[$productoId]['cantidad'];
             if ($currentQuantity >= $inventario->stock) {
                 Notification::make()
                     ->title("No se pueden agregar mas productos. Solo {$inventario->stock} en stock")
@@ -101,14 +113,15 @@ class POS extends Component
                     ->send();
                 return;
             }
-            //agregar mas productos
-            $this->cart[$productoId]['stock']++;
+            $this->cart[$productoId]['cantidad']++;
         } else {
             $this->cart[$productoId]  = [
                 'id' => $producto->id,
                 'nombre_producto' => $producto->nombre_producto,
                 'codigo_producto' => $producto->codigo_producto,
                 'valor_detal_producto' => $producto->valor_detal_producto,
+                'valor_ferretero_producto' => $producto->valor_ferretero_producto,
+                'valor_mayorista_producto' => $producto->valor_mayorista_producto,
                 'cantidad' => 1,
             ];
         }
@@ -177,19 +190,14 @@ class POS extends Component
             //Crear Productos Vendidos
 
             foreach ($this->cart as $producto) {
+                $precio_unitario = $this->getPrecioProducto($producto);
+                $subtotal = $precio_unitario * $producto['cantidad'];
                 DetallePedido::create([
                     'pedido_id' => $pedido->id,
                     'producto_id' => $producto['id'],
                     'cantidad' => $producto['cantidad'],
-                    //'precio_unitario' => $producto['valor_detal_producto']
-                    //'subtotal'
-
-                    //'producto_id' => 2,
-                    //'cantidad' => 1,
-                    'precio_unitario' => 1000,
-                    'subtotal' => 1000,
-
-
+                    'precio_unitario' => $precio_unitario,
+                    'subtotal' => $subtotal,
                 ]);
 
 
@@ -222,6 +230,19 @@ class POS extends Component
                 ->body('Error al completar la venta, intentelo de nuevo')
                 ->danger()
                 ->send();
+        }
+    }
+
+    public function getPrecioProducto($producto)
+    {
+        switch ($this->tipo_precio) {
+            case 'FERRETERO':
+                return $producto['valor_ferretero_producto'];
+            case 'MAYORISTA':
+                return $producto['valor_mayorista_producto'];
+            case 'DETAL':
+            default:
+                return $producto['valor_detal_producto'];
         }
     }
 
