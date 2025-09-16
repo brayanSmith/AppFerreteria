@@ -16,14 +16,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cliente_id')->constrained('clientes');
             //$table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->enum('estado', ['borrador','pagado','anulado'])->default('borrador');
+            $table->enum('estado', ['BORRADOR','PAGADO','ANULADO'])->default('BORRADOR');
             $table->enum('metodo_pago', ['A CREDITO', 'EFECTIVO'])->default('A CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
             $table->text('primer_comentario')->nullable();
             $table->text('segundo_comentario')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);
-            $table->decimal('impuestos', 12, 2)->default(0);
-            $table->decimal('total', 12, 2)->default(0);
             $table->timestamps();
         });
     }

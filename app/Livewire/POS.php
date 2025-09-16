@@ -26,12 +26,16 @@ class POS extends Component
 
     //propiedades para validar
     public $cliente_id = null;
-    public $paid_amount = 0;
+
     public $valor_decuento = 0; //
     public $metodo_pago = "A CREDITO";
     public $tipo_precio = "DETAL";
 
     public $valor_producto = 0;
+
+    // Comentarios
+    public $primer_comentario = '';
+    public $segundo_comentario = '';
 
     public function mount()
     {
@@ -63,29 +67,6 @@ class POS extends Component
         return collect($this->cart)->sum(function($producto) {
             return $this->getPrecioProducto($producto) * $producto['cantidad'];
         });
-    }
-
-    //placeholder para tax
-
-    #[Computed]
-    public function tax()
-    {
-        return $this->subtotal * 0.15;
-    }
-
-
-    #[Computed]
-    public function totalBeforeDiscount()
-    {
-        return $this->subtotal + $this->tax;
-    }
-
-
-    #[Computed]
-    public function total()
-    {
-        $discountedTotal = $this->totalBeforeDiscount - $this->valor_decuento;
-        return $discountedTotal;
     }
 
 
@@ -165,17 +146,6 @@ class POS extends Component
                 ->send();
             return;
         }
-        // validacion basica para el paid_amount (con cuanto paga el cliente)
-        /*if ($this->paid_amount < $this->total){
-            Notification::make()
-            ->title('Venta Fallida')
-            ->body('El valor pagado es menor al de la venta')
-            ->danger()
-            ->send();
-            return;
-        }*/
-
-        //
 
 
         //crear la venta... db
@@ -186,6 +156,14 @@ class POS extends Component
             $pedido = Pedido::create([
 
                 'cliente_id' => $this->cliente_id,
+                'estado' => 'BORRADOR',
+                'metodo_pago' => $this->metodo_pago,
+                'tipo_precio' => $this->tipo_precio,
+                'primer_comentario' => $this->primer_comentario,
+                'segundo_comentario' => $this->segundo_comentario,
+                'subtotal' => $this->subtotal(),
+
+
             ]);
 
             //Crear Productos Vendidos
@@ -199,15 +177,16 @@ class POS extends Component
                     'cantidad' => $producto['cantidad'],
                     'precio_unitario' => $precio_unitario,
                     'subtotal' => $subtotal,
+
                 ]);
 
 
                 //actualizar ek stock
-                /*$inventario = Producto::where($producto['id'])->first();
+                $inventario = Producto::find($producto['id']);
                 if ($inventario) {
                     $inventario->stock -= $producto['cantidad'];
                     $inventario->save();
-                }*/
+                }
             }
             DB::commit();
 
@@ -217,7 +196,10 @@ class POS extends Component
             //resetear otras propiedades
             $this->search = '';
             $this->cliente_id = null;
-            $this->paid_amount = 0;
+            $this->metodo_pago = "A CREDITO";
+            $this->tipo_precio = "DETAL";
+            $this->primer_comentario = '';
+            $this->segundo_comentario = '';
 
             Notification::make()
                 ->title('Pedido Registrado!')

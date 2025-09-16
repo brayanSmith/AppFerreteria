@@ -79,9 +79,11 @@
     {{-- Right panel --}}
     <div
         class="w-1/3 bg-white dark:bg-neutral-800 border-l dark:border-neutral-700 p-6 flex flex-col shadow-xl overflow-y-auto">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Checkout</h2>
-
-        <div class="flex-grow pr-2">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Productos agregados: {{ collect($this->cart)->sum('cantidad') }}
+        </h2>
+        {{-- Productos en el carrito --}}
+    <div class="flex-grow pr-2 overflow-y-auto max-h-96">
             @forelse($this->cart as $cartProduct)
                 <div
                     class="flex items-center justify-between p-4 mb-4 bg-gray-50 dark:bg-neutral-700 rounded-xl shadow-sm">
@@ -93,8 +95,12 @@
                             SKU: {{ $cartProduct['codigo_producto'] }}
                         </p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            COP {{ number_format($this->getPrecioProducto($cartProduct), 2) }}
+                            COP: {{ number_format($this->getPrecioProducto($cartProduct), 2) }}
                         </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold">
+                            <span class="font-bold">TOTAL:</span> {{ number_format($this->getPrecioProducto($cartProduct) * $cartProduct['cantidad'], 2) }}
+                        </p>
+
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -191,59 +197,30 @@
 
 
 
-            <div class="mt-4">
-                <label for="descuento" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Discount Amount
-                </label>
 
-                <input wire:model.live.blur="valor_decuento" type="number" id="descuento" min="0"
-                    placeholder="Enter descuento amount"
-                    class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
-               focus:border-blue-500 focus:ring-blue-500
-               dark:bg-neutral-900 dark:border-neutral-700
-               dark:text-neutral-400 dark:placeholder-neutral-500
-               dark:focus:ring-neutral-600">
+            <div class="mt-4">
+                <label for="primer_comentario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primer comentario</label>
+                <textarea id="primer_comentario" wire:model="primer_comentario" rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100 mb-2"
+                    placeholder="Escribe el primer comentario..."></textarea>
+            </div>
+            <div class="mt-2">
+                <label for="segundo_comentario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Segundo comentario</label>
+                <textarea id="segundo_comentario" wire:model="segundo_comentario" rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100"
+                    placeholder="Escribe el segundo comentario..."></textarea>
             </div>
 
-
-
             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">Subtotal:</span>
-                    <span class="font-medium text-gray-900 dark:text-gray-100">
-                        COP {{ number_format(num: $this->subtotal, decimals: 2) }}
-                    </span>
-                </div>
 
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">Tax (15%):</span>
-                    <span class="font-medium text-gray-900 dark:text-gray-100">
-                        COP {{ number_format(num: $this->tax, decimals: 2) }}
-                    </span>
-                </div>
-
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">Total before discount:</span>
-                    <span class="font-medium text-gray-900 dark:text-gray-100">
-                        COP {{ number_format(num: $this->totalBeforeDiscount, decimals: 2) }}
-                    </span>
-                </div>
-
-                <div class="flex justify-between items-center mb-2 text-red-500 dark:text-red-400">
-                    <span class="text-sm font-semibold">Discount:</span>
-                    <span class="font-semibold">- COP
-                        {{ number_format(num: $this->valor_decuento, decimals: 2) }}</span>
+                <div class="flex justify-between items-center mb-2 text-lg font-bold">
+                    <span>Total a pagar:</span>
+                    <span>COP {{ number_format(num: $this->subtotal, decimals: 2) }}</span>
                 </div>
             </div>
         </div>
 
         <div class="flex-shrink-0 mt-6">
-            <input wire:model.live.blur="paid_amount" type="number" min="0" placeholder="Amount Paid"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
-               focus:border-blue-500 focus:ring-blue-500 mb-4
-               dark:bg-neutral-900 dark:border-neutral-700
-               dark:text-neutral-400 dark:placeholder-neutral-500
-               dark:focus:ring-neutral-600" />
 
             <button wire:click="checkout" wire:loading.attr="disabled"
                 class="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg
