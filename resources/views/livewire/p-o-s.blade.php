@@ -112,8 +112,8 @@
         </button>
     </flux:modal.trigger>
 
-    <flux:modal name="edit-profile" variant="flyout">
-        <div class="space-y-6">
+    <flux:modal name="edit-profile" variant="flyout" class="md:w-200">
+        <div class="space-y-6 max-w-2xl mx-auto">
                 <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                     Productos agregados: {{ collect($this->cart)->sum('cantidad') }}
                 </h2>
@@ -131,9 +131,8 @@
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
                                     COP: {{ number_format($this->getPrecioProducto($cartProduct), 2) }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 font-bold">
-                                    <span class="font-bold">TOTAL:</span>
+
+                                    <span class="font-bold">| TOTAL:</span>
                                     {{ number_format($this->getPrecioProducto($cartProduct) * $cartProduct['cantidad'], 2) }}
                                 </p>
 
@@ -271,13 +270,6 @@
                         Complete Sale
                     </button>
                 </div>
-
-
-
-
-
         </div>
     </flux:modal>
-
-
 </div>

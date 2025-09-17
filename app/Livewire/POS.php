@@ -154,6 +154,7 @@ class POS extends Component
                 ->body('Tu carro esta vacio')
                 ->danger()
                 ->send();
+
             return;
         }
 
