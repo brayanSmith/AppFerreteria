@@ -66,7 +66,7 @@ class POS extends Component
     #[Computed]
     public function subtotal()
     {
-        return collect($this->cart)->sum(function($producto) {
+        return collect($this->cart)->sum(function ($producto) {
             return $this->getPrecioProducto($producto) * $producto['cantidad'];
         });
     }
@@ -78,8 +78,8 @@ class POS extends Component
     // Agregar producto al carrito (comportamiento original)
     public function addToCart($productoId, $cantidad = 2)
     {
-    $producto = Producto::find($productoId);
-    $inventario = Producto::find($productoId);
+        $producto = Producto::find($productoId);
+        $inventario = Producto::find($productoId);
         if (!$inventario || $inventario->stock <= 0) {
             Notification::make()
                 ->title('Este Proucto esta fuera de Stock!')
@@ -217,9 +217,12 @@ class POS extends Component
                 ->body('El pedido fue ingresado exitosamente!')
                 ->success()
                 ->send();
+
+            // 🚀 Descargar automáticamente el PDF
+            return redirect()->route('pedidos.pdf.download', $pedido->id);
         } catch (Exception $th) {
             DB::rollBack();
-             Notification::make()
+            Notification::make()
                 ->title('Error al Registrar!')
                 ->body('Error al completar la venta, intentelo de nuevo')
                 ->danger()

@@ -18,8 +18,7 @@ class Pedido extends Model
         'primer_comentario',
         'segundo_comentario',
         'subtotal',
-        'impuestos',
-        'total'
+
     ];
 
     protected $casts = [
@@ -29,13 +28,13 @@ class Pedido extends Model
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
     }
-    public function detallePedidos()
+    public function detalles()
     {
         return $this->hasMany(DetallePedido::class);
     }
 
     public function recalcularTotales(float $tasaImpuesto = 0.0){
-        $subtotal = $this->detalle()->sum('subtotal');
+        $subtotal = $this->detalles()->sum('subtotal');
         $impuestos = round($subtotal * $tasaImpuesto, 2);
         $total = $subtotal + $impuestos;
         $this->updateQuietly(compact('subtotal', 'impuestos', 'total'));
