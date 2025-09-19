@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\DB;
 
 class POS extends Component
 {
-
+    // Modal de confirmación de venta
+    public $showConfirmModal = false;
+    public $confirmModalTitle = '';
+    public $confirmModalBody = '';
 
     //Propiedades
     public $productos;
@@ -154,14 +157,13 @@ class POS extends Component
                 ->body('Tu carro esta vacio')
                 ->danger()
                 ->send();
-
             return;
         }
-
+        DB::beginTransaction();
 
         //crear la venta... db
         try {
-            DB::beginTransaction();
+
 
             //crear la venta
             $pedido = Pedido::create([
@@ -201,6 +203,7 @@ class POS extends Component
             }
             DB::commit();
 
+
             //reset cart
             $this->cart = [];
 
@@ -212,21 +215,31 @@ class POS extends Component
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
 
-            Notification::make()
-                ->title('Pedido Registrado!')
-                ->body('El pedido fue ingresado exitosamente!')
-                ->success()
-                ->send();
+
+            // Guardar la URL del PDF en la sesión para mostrar el botón en la modal
+            session(['pedido_pdf_url' => route('pedidos.pdf.download', $pedido->id)]);
+            $this->showConfirmModal = true;
+            $this->confirmModalTitle = '¡Venta exitosa!';
+            $this->confirmModalBody = 'El pedido fue ingresado exitosamente.';
+
+            // 🚀 Cerrar la modal del carrito
+            $this->dispatch('cerrar-modal-carrito');
 
             // 🚀 Descargar automáticamente el PDF
-            return redirect()->route('pedidos.pdf.download', $pedido->id);
+            //return redirect()->route('pedidos.pdf.download', $pedido->id);
+
+            // 🚀 Llamar al evento JS con la URL del PDF
+            /*$this->dispatchBrowserEvent('descargar-pdf', [
+                'url' => route('pedidos.pdf.download', $pedido->id),
+            ]);*/
+
+            // Limpiar la URL de PDF de la sesión después de mostrar la modal
         } catch (Exception $th) {
             DB::rollBack();
-            Notification::make()
-                ->title('Error al Registrar!')
-                ->body('Error al completar la venta, intentelo de nuevo')
-                ->danger()
-                ->send();
+            session()->forget('pedido_pdf_url');
+            $this->showConfirmModal = true;
+            $this->confirmModalTitle = 'Error al registrar';
+            $this->confirmModalBody = 'Error al completar la venta, intentelo de nuevo.\n' . $th->getMessage();
         }
     }
 

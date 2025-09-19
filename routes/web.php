@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Route::get('productos/{producto}/edit', \App\Livewire\Productos\EditProducto::class)->name('productos.edit');
     Route::get('/pos', \App\Livewire\POS::class)->name('pos');
 
-    //Route::get('/pedido/{id}/pdf', [PedidoPDFController::class, 'stream'])->name('pedidos.pdf.stream');
+    Route::get('/pedido/{id}/pdf', [PedidoPDFController::class, 'stream'])->name('pedidos.pdf.stream');
     Route::get('/pedido/{id}/pdf/download', [PedidoPDFController::class, 'download'])->name('pedidos.pdf.download');
 
 });

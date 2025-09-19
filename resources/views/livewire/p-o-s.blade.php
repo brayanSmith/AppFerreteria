@@ -1,3 +1,18 @@
+<div>
+    <!-- Modal de confirmación de venta (Alpine/Filament) -->
+    <div x-data="{ show: @entangle('showConfirmModal') }" x-show="show" x-transition class="fixed inset-0 z-50 flex items-center justify-center" style="display: none;">
+        <div class="absolute inset-0 bg-black opacity-40"></div>
+        <div class="relative bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-8 z-50 flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">{{ $confirmModalTitle }}</h2>
+            <p class="mb-6 text-center text-gray-700 dark:text-gray-200">{{ $confirmModalBody }}</p>
+            <div class="flex gap-4">
+                @if(session('pedido_pdf_url'))
+                    <a href="{{ session('pedido_pdf_url') }}" target="_blank" class="px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">Descargar PDF</a>
+                @endif
+                <button @click="show = false" wire:click="$set('showConfirmModal', false)" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Cerrar</button>
+            </div>
+        </div>
+    </div>
 <div class="flex h-screen bg-gray-100 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
 
     <!-- Panel izquierdo -->
@@ -268,3 +283,39 @@
         </div>
     </flux:modal>
 </div>
+
+
+
+<script>
+    window.addEventListener('cerrar-modal-carrito', () => {
+        // Intenta cerrar la modal de Flux
+        if (window.Fluxtore && window.Fluxtore.modals && typeof window.Fluxtore.modals.close === 'function') {
+            window.Fluxtore.modals.close('edit-profile');
+        } else {
+            // Fallback: busca y cierra la modal manualmente
+            const modal = document.querySelector('[data-modal-name="edit-profile"]');
+            if (modal) {
+                // Si la modal tiene un botón de cerrar, haz click
+                const closeBtn = modal.querySelector('[data-modal-close], .close, .btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    // O simplemente oculta la modal
+                    modal.style.display = 'none';
+                }
+            }
+            // Alternativa: dispara el evento de cierre por nombre (para otros sistemas)
+            window.dispatchEvent(new CustomEvent('close-modal', { detail: { name: 'edit-profile' } }));
+        }
+    });
+    </script>
+
+    {{--<script>
+        window.addEventListener('descargar-pdf', event => {
+            // Abre la descarga del PDF en una nueva pestaña
+            window.open(event.detail.url, '_blank');
+        });
+    </script>--}}
+</div>
+
+
