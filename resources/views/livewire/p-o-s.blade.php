@@ -2,8 +2,13 @@
 
     <x-filament::modal slide-over width="2xl">
         <x-slot name="trigger">
-            <x-filament::button>
-                Open modal
+            <x-filament::button
+                class="rounded-full flex items-center gap-2 px-4 py-2 fixed bottom-8 right-8 z-50 shadow-lg bg-info-600 text-white hover:bg-info-700 focus:outline-none focus:ring-2 focus:ring-info-500"
+                icon="heroicon-m-shopping-cart"
+                color="info"
+                style="min-width: 64px; min-height: 48px;"
+            >
+                <span class="ml-1 font-bold">({{ collect($this->cart)->sum('cantidad') }})</span>
             </x-filament::button>
         </x-slot>
 
@@ -298,7 +303,7 @@
 
         <!-- Panel derecho -->
 
-        <!-- Botón flotante para abrir el modal del carrito -->
+        <!-- Botón flotante para abrir el modal del carrito
         <flux:modal.trigger name="edit-profile">
             <button type="button"
                 class="fixed z-50 bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -309,7 +314,7 @@
                 </svg>
                 <span class="ml-2 font-bold">({{ collect($this->cart)->sum('cantidad') }})</span>
             </button>
-        </flux:modal.trigger>
+        </flux:modal.trigger>-->
 
         <flux:modal name="edit-profile" variant="flyout" class="md:w-200">
             <div class="space-y-6 max-w-2xl mx-auto">

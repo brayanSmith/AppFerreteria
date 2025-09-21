@@ -237,9 +237,11 @@ class POS extends Component
         } catch (Exception $th) {
             DB::rollBack();
             session()->forget('pedido_pdf_url');
-            $this->showConfirmModal = true;
-            $this->confirmModalTitle = 'Error al registrar';
-            $this->confirmModalBody = 'Error al completar la venta, intentelo de nuevo.\n' . $th->getMessage();
+            Notification::make()
+                ->title('Error al registrar')
+                ->body('Error al completar la venta, intentelo de nuevo.\n' . $th->getMessage())
+                ->danger()
+                ->send();
         }
     }
 
