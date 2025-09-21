@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use App\Models\Pedido;
 use Dom\Text;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Columns\TextColumn;
 
 class ListPedidos extends Component implements HasActions, HasSchemas, HasTable
@@ -23,10 +25,32 @@ class ListPedidos extends Component implements HasActions, HasSchemas, HasTable
     use InteractsWithTable;
     use InteractsWithSchemas;
 
+    public function getTabs(): array
+    {
+        return [
+            'ALL' => Tab::make(),
+            'FERRETERO' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'FERRETERO')),
+            'MAYORISTA' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'MAYORISTA')),
+            'DETAL' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'DETAL')),
+        ];
+    }
+
     public function table(Table $table): Table
     {
         return $table
+
             ->query(fn (): Builder => Pedido::query())
+            /*->groups([
+                'metodo_pago',
+                'estado',
+            ])
+
+            ->defaultGroup('metodo_pago')*/
+
+
             ->columns([
                 //
                 TextColumn::make('id')
@@ -56,6 +80,16 @@ class ListPedidos extends Component implements HasActions, HasSchemas, HasTable
             ])
             ->headerActions([
                 //
+
+
+            'ALL' => Tab::make(),
+            'FERRETERO' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'FERRETERO')),
+            'MAYORISTA' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'MAYORISTA')),
+            'DETAL' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('tipo_precio', 'DETAL')),
+
             ])
             ->recordActions([
                 //

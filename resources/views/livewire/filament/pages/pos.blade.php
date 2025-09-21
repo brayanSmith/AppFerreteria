@@ -1,3 +1,4 @@
-<x-filament-panels::page>
+<x-filament::page>
     {{-- Page content --}}
-</x-filament-panels::page>
+    <livewire:p-o-s />
+</x-filament::page>
