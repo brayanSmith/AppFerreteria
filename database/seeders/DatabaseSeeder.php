@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Cliente;
 use App\Models\Producto;
+use App\Models\Ruta;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
         BodegaSeeder::class,
         CategoriaSeeder::class,
         SubCategoriaSeeder::class,
+        RutaSeeder::class,
         ]);
 
         User::factory()->create([
@@ -29,7 +31,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Producto::factory(200)->create();
+        Producto::factory(5000)->create();
         Cliente::factory(50)->create();
     }
 }

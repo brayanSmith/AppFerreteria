@@ -4,6 +4,7 @@
 /* Required by all components */
 @import '../../vendor/filament/support/resources/css/index.css';
 
+
 /* Required by actions and tables */
 @import '../../vendor/filament/actions/resources/css/index.css';
 

@@ -23,8 +23,10 @@ return new class extends Migration
             $table->string('representante_legal');
             $table->boolean('activo')->default(true);
             $table->string('novedad')->nullable();
+            $table->foreignId('ruta_id')->constrained('rutas')->cascadeOnDelete();
             $table->timestamps();
         });
+
     }
 
     /**

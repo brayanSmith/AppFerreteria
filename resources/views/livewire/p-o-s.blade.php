@@ -259,8 +259,15 @@
                                 <!-- Columna 3: Botón -->
                                 <div class="col-span-3 flex flex-col items-center justify-center">
                                     <div x-data="{ open: false, cantidad: 1 }">
-                                        <button @click="open = true; cantidad = 1"
-                                            class="w-full py-2 px-4 bg-indigo-600 text-white font-bold transition hover:bg-indigo-700 rounded-lg">Agregar</button>
+
+                                        <x-filament::button
+                                            @click="open = true; cantidad = 1"
+                                            class="w-full py-2 px-4 font-bold rounded-lg"
+                                            color="primary"
+                                            size="md"
+                                        >
+                                            Agregar
+                                        </x-filament::button>
                                         <!-- Modal de cantidad: pantalla completa, fondo borroso -->
                                         <div x-show="open" x-transition
                                             class="fixed inset-0 z-40 flex items-center justify-center"

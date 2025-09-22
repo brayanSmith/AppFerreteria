@@ -42,6 +42,8 @@ class POS extends Component
 
     public $cantidad = 1;
 
+    public $perPage = 10;
+
     public function mount()
     {
         //cargar todos los productos

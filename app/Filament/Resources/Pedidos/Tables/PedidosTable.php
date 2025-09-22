@@ -18,7 +18,7 @@ class PedidosTable
                 TextColumn::make('cliente_id')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('fecha')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('estado')

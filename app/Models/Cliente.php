@@ -19,11 +19,16 @@ class Cliente extends Model
         'email',
         'representante_legal',
         'activo',
-        'novedad'
+        'novedad',
+        'ruta_id',
     ];
 
     public function pedidos()
     {
         return $this->hasMany(Pedido::class);
+    }
+    public function ruta()
+    {
+        return $this->belongsTo(Ruta::class, 'ruta_id');
     }
 }

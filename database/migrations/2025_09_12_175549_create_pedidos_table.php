@@ -14,8 +14,10 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
+            $table->string('codigo')->unique()->nullable();
             $table->foreignId('cliente_id')->constrained('clientes');
-            //$table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->string('ciudad')->nullable();
             $table->enum('estado', ['BORRADOR','PAGADO','ANULADO'])->default('BORRADOR');
             $table->enum('metodo_pago', ['A CREDITO', 'EFECTIVO'])->default('A CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
