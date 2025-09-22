@@ -8,6 +8,8 @@ use App\Models\Ruta;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Pedido;
+use App\Models\DetallePedido;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,5 +35,19 @@ class DatabaseSeeder extends Seeder
 
         Producto::factory(5000)->create();
         Cliente::factory(50)->create();
+
+        Pedido::factory()
+            ->count(20)
+            ->has(
+                DetallePedido::factory()->count(10),
+                'detalles'
+            )
+            ->create()
+            ->each(function ($pedido) {
+                // Recalcular subtotal del pedido según sus detalles
+                $pedido->update([
+                    'subtotal' => $pedido->detalles->sum('subtotal')
+                ]);
+            });
     }
 }

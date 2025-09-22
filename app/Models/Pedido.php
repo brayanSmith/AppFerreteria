@@ -14,6 +14,7 @@ class Pedido extends Model
         'codigo',
         'cliente_id',
         'fecha',
+        'fecha_sola',
         'ciudad',
         'estado',
         'metodo_pago',
@@ -21,10 +22,12 @@ class Pedido extends Model
         'primer_comentario',
         'segundo_comentario',
         'subtotal',
+        'levantar_deuda',
     ];
 
     protected $casts = [
         'fecha' => 'datetime',
+        'fecha_sola' => 'date',
     ];
     public function cliente()
     {

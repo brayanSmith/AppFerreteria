@@ -5,14 +5,28 @@ namespace App\Filament\Resources\Pedidos\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Grouping\Group;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class PedidosTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->groups([
+                Group::make('fecha')
+                    ->date()
+                    ->collapsible(),
+                Group::make('cliente.ruta.ruta')
+                    ->collapsible(),
+
+
+            ])->defaultGroup('fecha')
             ->columns([
                 TextColumn::make('fecha')
                     ->dateTime()
@@ -23,17 +37,21 @@ class PedidosTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('cliente.ruta.ruta')
-                ->label('Ruta')
+                    ->label('Ruta')
                     ->sortable(),
 
                 TextColumn::make('subtotal')
                     ->numeric()
                     ->sortable(),
+
+                ToggleColumn::make('levantar_deuda')
+                    ->label('Levantar Deuda'),
+
                 TextColumn::make('ciudad')
                     ->searchable(),
                 TextColumn::make('estado')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'PENDIENTE' => 'warning',
                         'FACTURADO' => 'success',
                         'ANULADO' => 'danger',
@@ -41,7 +59,7 @@ class PedidosTable
                     }),
                 TextColumn::make('metodo_pago')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'EFECTIVO' => 'success',
                         'A CREDITO' => 'info',
                         default => 'secondary',
@@ -58,7 +76,22 @@ class PedidosTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // Filtro por Ruta
+                SelectFilter::make('cliente.ruta_id')
+                    ->label('Ruta')
+                    ->relationship('cliente.ruta', 'ruta')
+                    ->searchable()
+                    ->preload()
+                    ->multiple(),
+
+                // Filtro por Cliente
+                SelectFilter::make('cliente_id')
+                    ->label(label: 'Cliente')
+                    ->relationship('cliente', 'razon_social')
+                    ->searchable()
+                    ->preload()
+                    ->multiple(),
+
             ])
             ->recordActions([
                 EditAction::make(),
