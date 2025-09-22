@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Pedidos\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -15,23 +14,40 @@ class PedidosTable
     {
         return $table
             ->columns([
-                TextColumn::make('cliente_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
+                TextColumn::make('fecha')
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('estado')
-                    ->badge(),
+                TextColumn::make('codigo')
+                    ->searchable(),
+                TextColumn::make('cliente.razon_social')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('cliente.ruta.ruta')
+                ->label('Ruta')
+                    ->sortable(),
+
                 TextColumn::make('subtotal')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('impuestos')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('total')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('ciudad')
+                    ->searchable(),
+                TextColumn::make('estado')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'PENDIENTE' => 'warning',
+                        'FACTURADO' => 'success',
+                        'ANULADO' => 'danger',
+                        default => 'primary',
+                    }),
+                TextColumn::make('metodo_pago')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'EFECTIVO' => 'success',
+                        'A CREDITO' => 'info',
+                        default => 'secondary',
+                    }),
+                TextColumn::make('tipo_precio')
+                    ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -45,7 +61,6 @@ class PedidosTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

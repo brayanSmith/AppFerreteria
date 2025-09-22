@@ -38,9 +38,7 @@ class Pedido extends Model
     public function recalcularTotales(float $tasaImpuesto = 0.0)
     {
         $subtotal = $this->detalles()->sum('subtotal');
-        $impuestos = round($subtotal * $tasaImpuesto, 2);
-        $total = $subtotal + $impuestos;
-        $this->updateQuietly(compact('subtotal', 'impuestos', 'total'));
+        $this->updateQuietly(compact('subtotal'));
     }
 
     //Crear el codigo del pedido despues de crear el pedido

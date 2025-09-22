@@ -12,10 +12,15 @@ use Filament\Notifications\Notification;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
-
+use Livewire\WithPagination;
 
 class POS extends Component
 {
+    use WithPagination;
+
+    // Tema de paginación (Tailwind por Filament)
+    protected $paginationTheme = 'tailwind';
+
     // Modal de confirmación de venta
     public $showConfirmModal = false;
     public $confirmModalTitle = '';
@@ -39,6 +44,7 @@ class POS extends Component
     // Comentarios
     public $primer_comentario = '';
     public $segundo_comentario = '';
+    public $ciudad = '';
 
     public $cantidad = 1;
 
@@ -47,25 +53,35 @@ class POS extends Component
     public function mount()
     {
         //cargar todos los productos
-        $this->productos = Producto::where('stock', '>', 0)
-            ->where('activo', 1)
-            ->get();
-        //cargar todos los clientes
         $this->clientes = Cliente::all();
-
-        //dd($this->productos, $this->clientes);
     }
+
+    // Resetear la página cuando cambia el buscador o el tamaño de página
+    public function updated($name, $value)
+    {
+        if (in_array($name, ['search', 'perPage'])) {
+            $this->resetPage();
+        }
+    }
+
 
     #[Computed]
     public function filteredProducts()
     {
-        if (empty($this->search)) {
-            return $this->productos;
-        }
-        return $this->productos->filter(function ($producto) {
-            return str_contains(strtolower($producto->nombre_producto), strtolower($this->search))
-                || str_contains(strtolower($producto->codigo_producto), strtolower($this->search));
-        });
+        return Producto::query()
+            ->where('stock', '>', 0)
+            ->where('activo', 1)
+            ->when(
+                $this->search,
+                fn($q) =>
+                $q->where(
+                    fn($qq) =>
+                    $qq->where('nombre_producto', 'like', "%{$this->search}%")
+                        ->orWhere('codigo_producto', 'like', "%{$this->search}%")
+                )
+            )
+            ->orderBy('nombre_producto')
+            ->paginate($this->perPage);
     }
 
     #[Computed]
@@ -76,9 +92,6 @@ class POS extends Component
         });
     }
 
-
-    #[Computed]
-    public function change() {}
 
     // Agregar producto al carrito (comportamiento original)
     public function addToCart($productoId, $cantidad = 2)
@@ -165,20 +178,17 @@ class POS extends Component
 
         //crear la venta... db
         try {
-
-
             //crear la venta
             $pedido = Pedido::create([
 
                 'cliente_id' => $this->cliente_id,
-                'estado' => 'BORRADOR',
+                'estado' => 'PENDIENTE',
                 'metodo_pago' => $this->metodo_pago,
                 'tipo_precio' => $this->tipo_precio,
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
                 'subtotal' => $this->subtotal(),
-
-
+                'ciudad' => $this->ciudad,
             ]);
 
             //Crear Productos Vendidos
@@ -216,6 +226,7 @@ class POS extends Component
             $this->tipo_precio = "DETAL";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
+            $this->ciudad = '';
 
 
             // Guardar la URL del PDF en la sesión para mostrar el botón en la modal

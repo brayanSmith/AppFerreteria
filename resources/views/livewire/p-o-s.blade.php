@@ -4,10 +4,7 @@
         <x-slot name="trigger">
             <x-filament::button
                 class="rounded-full flex items-center gap-2 px-4 py-2 fixed bottom-8 right-8 z-50 shadow-lg bg-info-600 text-white hover:bg-info-700 focus:outline-none focus:ring-2 focus:ring-info-500"
-                icon="heroicon-m-shopping-cart"
-                color="info"
-                style="min-width: 64px; min-height: 48px;"
-            >
+                icon="heroicon-m-shopping-cart" color="info" style="min-width: 64px; min-height: 48px;">
                 <span class="ml-1 font-bold">({{ collect($this->cart)->sum('cantidad') }})</span>
             </x-filament::button>
         </x-slot>
@@ -77,6 +74,19 @@
                             <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
                         @endforeach
                     </select>
+                </div>
+
+                {{-- Ciudad --}}
+                <div class="space-y-2">
+                    <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Ciudad
+                    </label>
+                    <input type="text" id="ciudad" wire:model="ciudad" placeholder="Escriba la Ciudad"
+                        class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
+                   focus:border-blue-500 focus:ring-blue-500
+                   dark:bg-neutral-900 dark:border-neutral-700
+                   dark:text-neutral-400 dark:placeholder-neutral-500
+                   dark:focus:ring-neutral-600">
                 </div>
 
                 {{-- ...Metodo de Pago... --}}
@@ -193,6 +203,7 @@
             </div>
         </div>
     </div>
+
     <div class="flex h-screen bg-gray-100 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
 
         <!-- Panel izquierdo -->
@@ -225,87 +236,96 @@
 
             <!-- Listado de productos -->
             <div class="flex-grow overflow-y-auto pr-2">
+                @php($products = $this->filteredProducts) {{-- paginator --}}
                 <div class="grid grid-cols-1 gap-6">
-                    @forelse($this->filteredProducts as $product)
-                        <div
-                            class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-4">
-                            <div class="grid grid-cols-12 gap-4 items-center">
-                                <!-- Columna 1: Imagen -->
-                                <div class="col-span-3 flex items-center justify-center">
-                                    <div
-                                        class="w-24 h-24 bg-gray-200 dark:bg-neutral-700 rounded-lg flex items-center justify-center overflow-hidden">
-                                        @if ($product->imagen_producto)
-                                            <img src="{{ asset('storage/' . $product->imagen_producto) }}"
-                                                alt="{{ $product->nombre_producto }}"
-                                                class="object-contain h-24 w-24" />
-                                        @else
-                                            <span class="text-sm text-gray-500 dark:text-gray-400">Sin imagen</span>
-                                        @endif
+                    @forelse($products as $product)
+                        <div wire:key="prod-{{ $product->id }}"
+                            class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg ...">
+                            <div
+                                class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-4">
+                                <div class="grid grid-cols-12 gap-4 items-center">
+                                    <!-- Columna 1: Imagen -->
+                                    <div class="col-span-3 flex items-center justify-center">
+                                        <div
+                                            class="w-24 h-24 bg-gray-200 dark:bg-neutral-700 rounded-lg flex items-center justify-center overflow-hidden">
+                                            @if ($product->imagen_producto)
+                                                <img src="{{ asset('storage/' . $product->imagen_producto) }}"
+                                                    alt="{{ $product->nombre_producto }}"
+                                                    class="object-contain h-24 w-24" />
+                                            @else
+                                                <span class="text-sm text-gray-500 dark:text-gray-400">Sin
+                                                    imagen</span>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- Columna 2: Info -->
-                                <div class="col-span-6">
-                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-lg">
-                                        {{ $product->nombre_producto }}</h3>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
-                                        {{ $product->codigo_producto }}</p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">DETAL:
-                                        {{ number_format($product->valor_detal_producto, 2) }}</p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">FERRETERO:
-                                        {{ number_format($product->valor_ferretero_producto, 2) }}</p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">MAYORISTA:
-                                        {{ number_format($product->valor_mayorista_producto, 2) }}</p>
-                                </div>
-                                <!-- Columna 3: Botón -->
-                                <div class="col-span-3 flex flex-col items-center justify-center">
-                                    <div x-data="{ open: false, cantidad: 1 }">
 
-                                        <x-filament::button
-                                            @click="open = true; cantidad = 1"
-                                            class="w-full py-2 px-4 font-bold rounded-lg"
-                                            color="primary"
-                                            size="md"
-                                        >
-                                            Agregar
-                                        </x-filament::button>
-                                        <!-- Modal de cantidad: pantalla completa, fondo borroso -->
-                                        <div x-show="open" x-transition
-                                            class="fixed inset-0 z-40 flex items-center justify-center"
-                                            style="display: none;">
-                                            <!-- Fondo borroso -->
-                                            <div @click="open = false"
-                                                class="absolute inset-0 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-sm transition-all">
-                                            </div>
-                                            <div
-                                                class="relative bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-xs mx-auto p-6 z-50">
-                                                <button @click="open = false"
-                                                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white text-2xl">&times;</button>
-                                                <div class="mb-4 flex items-end gap-2">
-                                                    <div class="flex-1">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cantidad</label>
-                                                        <input type="number" min="1"
-                                                            :max="{{ $product->stock ?? 1000 }}"
-                                                            x-model.number="cantidad"
-                                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100" />
+                                    <!-- Columna 2: Info -->
+                                    <div class="col-span-6">
+                                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-lg">
+                                            {{ $product->nombre_producto }}
+                                        </h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
+                                            {{ $product->codigo_producto }}</p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">DETAL:
+                                            {{ number_format($product->valor_detal_producto, 2) }}</p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">FERRETERO:
+                                            {{ number_format($product->valor_ferretero_producto, 2) }}</p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">MAYORISTA:
+                                            {{ number_format($product->valor_mayorista_producto, 2) }}</p>
+                                    </div>
+
+                                    <!-- Columna 3: Botón -->
+                                    <div class="col-span-3 flex flex-col items-center justify-center">
+                                        <div x-data="{ open: false, cantidad: 1 }">
+                                            <x-filament::button @click="open = true; cantidad = 1"
+                                                class="w-full py-2 px-4 font-bold rounded-lg" color="primary"
+                                                size="md">
+                                                Agregar
+                                            </x-filament::button>
+
+                                            <!-- Modal de cantidad -->
+                                            <div x-show="open" x-transition
+                                                class="fixed inset-0 z-40 flex items-center justify-center"
+                                                style="display: none;">
+                                                <div @click="open = false"
+                                                    class="absolute inset-0 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-sm transition-all">
+                                                </div>
+                                                <div
+                                                    class="relative bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-xs mx-auto p-6 z-50">
+                                                    <button @click="open = false"
+                                                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white text-2xl">&times;</button>
+                                                    <div class="mb-4 flex items-end gap-2">
+                                                        <div class="flex-1">
+                                                            <label
+                                                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cantidad</label>
+                                                            <input type="number" min="1"
+                                                                :max="{{ $product->stock ?? 1000 }}"
+                                                                x-model.number="cantidad"
+                                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100" />
+                                                        </div>
+                                                        <button
+                                                            @click="$wire.addToCart({{ $product->id }}, cantidad); open = false"
+                                                            class="py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg transition hover:bg-indigo-700 whitespace-nowrap">
+                                                            Agregar
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        @click="$wire.addToCart({{ $product->id }}, cantidad); open = false"
-                                                        class="py-2 px-4 bg-indigo-600 text-white font-bold rounded-lg transition hover:bg-indigo-700 whitespace-nowrap">Agregar</button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> <!-- x-data -->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <p class="col-span-full text-center text-gray-500 dark:text-gray-400 mt-8">
-                            No products found.
+                        <p class="col-span-full text-center text-gray-500 dark:text-gray-400 mt-8">No products found.
                         </p>
                     @endforelse
                 </div>
+
+                <!-- Paginación Filament -->
+                <div class="mt-6">
+                    <x-filament::pagination :paginator="$products" :page-options="[5, 10, 20, 50, 'all']" current-page-option-property="perPage"
+                        {{-- ← sin dos puntos --}} extreme-links />
+
+                </div>
             </div>
-
-
-

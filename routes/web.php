@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/edit-producto{record}', \App\Livewire\Productos\EditProducto::class)->name('producto.edit');
     Route::get('/create-producto', \App\Livewire\Productos\CreateProducto::class)->name('producto.create');
 
-    Route::get('/manage-pedidos', \App\Livewire\Pedidos\ListPedidos::class)->name('pedidos.index');
+    //Route::get('/manage-pedidos', \App\Livewire\Pedidos\ListPedidos::class)->name('pedidos.index');
     //Route::get('productos/create', \App\Livewire\Productos\CreateProducto::class)->name('productos.create');
     //Route::get('productos/{producto}/edit', \App\Livewire\Productos\EditProducto::class)->name('productos.edit');
     Route::get('/pos', \App\Livewire\POS::class)->name('pos');
