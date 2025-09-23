@@ -38,18 +38,21 @@ class Pedido extends Model
         return $this->hasMany(DetallePedido::class);
     }
 
-    public function recalcularTotales(float $tasaImpuesto = 0.0)
+     /**
+     * 🔹 Recalcula subtotal del pedido
+     */
+    public function recalcularTotales(): void
     {
         $subtotal = $this->detalles()->sum('subtotal');
-        $this->updateQuietly(compact('subtotal'));
+        $this->saveQuietly(); // 👈 evita disparar eventos otra vez
+        $this->subtotal = $subtotal;
     }
 
-    //Crear el codigo del pedido despues de crear el pedido
     protected static function booted()
     {
         static::created(function ($pedido) {
             $pedido->codigo = 'PED-' . $pedido->id;
-            $pedido->save();
+            $pedido->saveQuietly();
         });
     }
 }

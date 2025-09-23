@@ -15,17 +15,25 @@ class ListPedidos extends ListRecords
     protected static string $resource = PedidoResource::class;
 
     public function getTabs(): array
-    {
-        return [
-            'TODOS' => Tab::make(),
-            'PENDIENTE' => Tab::make()
-                ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'PENDIENTE')),
-            'FACTURADO' => Tab::make()
-                ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'FACTURADO')),
-            'ANULADO' => Tab::make()
-                ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'ANULADO')),
-        ];
-    }
+{
+    return [
+        'TODOS' => Tab::make(),
+            //->badge(fn () => \App\Models\Pedido::count()),
+
+        'PENDIENTE' => Tab::make()
+            ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'PENDIENTE')),
+            //->badge(fn () => \App\Models\Pedido::where('estado', 'PENDIENTE')->count()),
+
+        'FACTURADO' => Tab::make()
+            ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'FACTURADO')),
+           // ->badge(fn () => \App\Models\Pedido::where('estado', 'FACTURADO')->count()),
+
+        'ANULADO' => Tab::make()
+            ->modifyQueryUsing(fn (EloquentBuilder $query) => $query->where('estado', 'ANULADO')),
+           // ->badge(fn () => \App\Models\Pedido::where('estado', 'ANULADO')->count()),
+    ];
+}
+
 
 
 

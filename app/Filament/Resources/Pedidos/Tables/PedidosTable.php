@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Pedidos\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -91,6 +92,17 @@ class PedidosTable
                     ->searchable()
                     ->preload()
                     ->multiple(),
+
+                // Filtro por Levantar Deuda (booleano)
+                /*TernaryFilter::make('levantar_deuda')
+                    ->label('Levantar deuda')
+                    ->boolean(),*/
+                SelectFilter::make('levantar_deuda')
+                    ->label('Levantar deuda')
+                    ->options([
+                        1 => 'Si',
+                        0 => 'No',
+                    ]),
 
             ])
             ->recordActions([

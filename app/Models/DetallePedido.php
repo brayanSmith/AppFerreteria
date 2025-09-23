@@ -26,4 +26,34 @@ class DetallePedido extends Model
     {
         return $this->belongsTo(Producto::class, 'producto_id');
     }
+
+     /**
+     * 🔹 Recalcula el subtotal del detalle
+     */
+    public function recalcularSubtotal(): void
+    {
+        $this->subtotal = ($this->cantidad ?? 0) * ($this->precio_unitario ?? 0);
+
+        // importante: no dispares eventos infinitos
+        $this->saveQuietly();
+    }
+
+    protected static function booted()
+    {
+        // cada vez que se cree o actualice un detalle
+        static::saving(function (DetallePedido $detalle) {
+            $detalle->subtotal = ($detalle->cantidad ?? 0) * ($detalle->precio_unitario ?? 0);
+        });
+
+        static::saved(function (DetallePedido $detalle) {
+            // actualiza el pedido padre
+            $detalle->pedido?->recalcularTotales();
+        });
+
+        static::deleted(function (DetallePedido $detalle) {
+            // también al borrar, recalculamos el pedido
+            $detalle->pedido?->recalcularTotales();
+        });
+    }
 }
+
