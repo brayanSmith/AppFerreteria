@@ -56,4 +56,12 @@ class Producto extends Model
         return $this->hasMany(DetalleProduccion::class);
     }
 
+    public function getPrecioPorTipo(string $tipo): float
+    {
+        return match ($tipo) {
+            'MAYORISTA' => $this->valor_mayorista_producto ?? 0,
+            'FERRETERO' => $this->valor_ferretero_producto ?? 0,
+            default     => $this->valor_detal_producto ?? 0,
+        };
+    }
 }

@@ -6,209 +6,239 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Repeater;
-use App\Models\Producto;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\ToggleButtons;
 
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use App\Models\Producto;
 
 class PedidoForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('codigo')
-                    ->default(null),
-                TextInput::make('cliente_id')
-                    ->required()
-                    ->numeric(),
-                DateTimePicker::make('fecha')
-                    ->required(),
-                TextInput::make('ciudad')
-                    ->default(null),
-                Select::make('estado')
-                    ->options([
-                        'PENDIENTE' => 'Pendiente',
-                        'FACTURADO' => 'Facturado',
-                        'ANULADO' => 'Anulado',
-                    ])
-                    ->default('PENDIENTE')
-                    ->required(),
-                Select::make('metodo_pago')
-                    ->options([
-                        'A CREDITO' => 'A Credito',
-                        'EFECTIVO' => 'Efectivo'
-                    ])
-                    ->default('A CREDITO')
-                    ->required(),
-                Select::make('tipo_precio')
-                    ->options([
-                        'FERRETERO' => 'Ferretero',
-                        'MAYORISTA' => 'Mayorista',
-                        'DETAL' => 'Detall'
-                    ])
-                    ->default('DETAL')
-                    ->required()
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $set, $get) {
-                        $detalles = $get('detalles') ?? [];
+        return $schema->components([
 
-                        foreach ($detalles as $index => $detalle) {
-                            if (empty($detalle['producto_id'])) {
-                                continue;
-                            }
+            // 🔹 Datos generales del pedido
+            Section::make('Datos del pedido')
+                ->columns(3)
+                ->schema([
+                    TextInput::make('codigo')
+                        ->disabled()
+                        ->columnSpan(1),
+                    
+                    Select::make('cliente_id')
+                        ->label('Cliente')
+                        ->relationship('cliente', 'razon_social')
+                        ->searchable()
+                        ->required()
+                        ->preload()
+                        ->columnSpan(2),
 
-                            $producto = Producto::find($detalle['producto_id']);
-                            if (! $producto) {
-                                continue;
-                            }
+                    DateTimePicker::make('fecha')
+                        ->required()
+                        ->columnSpan(1),
 
-                            // Elegir precio según el tipo
-                            $precio = match ($state) {
-                                'MAYORISTA' => $producto->valor_mayorista_producto ?? 0,
-                                'FERRETERO' => $producto->valor_ferretero_producto ?? 0,
-                                default     => $producto->valor_detal_producto ?? 0,
-                            };
+                    TextInput::make('ciudad')
+                        ->default(null)
+                        ->columnSpan(1),
 
-                            $cantidad = $detalle['cantidad'] ?? 0;
-                            $total = $cantidad * $precio;
+                    Select::make('estado')
+                        ->options([
+                            'PENDIENTE' => 'Pendiente',
+                            'FACTURADO' => 'Facturado',
+                            'ANULADO'   => 'Anulado',
+                        ])
+                        ->default('PENDIENTE')
+                        ->required()
+                        ->columnSpan(1),
 
-                            // actualizar fila en repeater
-                            $set("detalles.$index.precio_unitario", $precio);
-                            $set("detalles.$index.total", $total);
-                        }
-                        // recalcular subtotal
-                        $detalles = $get('detalles') ?? [];
-                        $subtotal = collect($detalles)->sum(fn($d) => $d['total'] ?? 0);
-                        $set('subtotal', $subtotal);
-                    }),
-                Textarea::make('primer_comentario')
-                    ->default(null)
-                    ->columnSpanFull(),
-                Textarea::make('segundo_comentario')
-                    ->default(null)
-                    ->columnSpanFull(),
-                TextInput::make('subtotal')
-                    ->required()
-                    ->numeric()
-                    ->default(0.0)
-                    ->disabled()        // 👈 para que no lo editen a mano
-                    ->dehydrated(true), // 👈 se guarda en BD aunque esté disabled
+                    Select::make('metodo_pago')
+                        ->options([
+                            'A CREDITO' => 'A Crédito',
+                            'EFECTIVO'  => 'Efectivo',
+                        ])
+                        ->default('A CREDITO')
+                        ->required()
+                        ->columnSpan(1),
+
+                    ToggleButtons::make('tipo_precio')
+                        ->options([
+                            'FERRETERO' => 'Ferretero',
+                            'MAYORISTA' => 'Mayorista',
+                            'DETAL'     => 'Detal',
+                        ])
+                        ->default('DETAL')
+                        ->grouped()
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(fn ($state, $set, $get) =>
+                            self::recalcularTodo($set, $get, $state)
+                        )
+                        ->columnSpan(1),
+                ]),
+
+                // 🔹 Totales
+            Section::make('Resumen')
+                ->schema([
+                    TextInput::make('subtotal')
+                        ->label('Subtotal general')
+                        ->numeric()
+                        ->default(0.0)
+                        ->disabled()
+                        ->dehydrated(true),
+                ])
+                ->columnSpan(1),
+
+            // 🔹 Comentarios
+            Section::make('Comentarios')
+                ->collapsed()
+                ->schema([
+                    Textarea::make('primer_comentario')
+                        ->label('Comentario inicial')
+                        ->default(null),
+
+                    Textarea::make('segundo_comentario')
+                        ->label('Comentario adicional')
+                        ->default(null),
+                ]),
+
+            // 🚨 Detalles del pedido (ocupa ancho completo)
+            Section::make('Detalles del pedido')
+                ->schema([
+                    Repeater::make('detalles')
+                        ->relationship('detalles')
+                        ->label('Productos')
+                        ->schema([
+                            Grid::make(5)->schema([
+                                Select::make('producto_id')
+                                    ->label('Producto')
+                                    ->relationship('producto', 'nombre_producto')
+                                    ->searchable()
+                                    ->required()
+                                    ->preload()
+                                    ->reactive()
+                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                    )
+                                    ->columnSpan(2),
+
+                                TextInput::make('cantidad')
+                                    ->numeric()
+                                    ->default(1)
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                    )
+                                    ->columnSpan(1),
+
+                                TextInput::make('precio_unitario')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->required()
+                                    ->reactive()
+                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                    )
+                                    ->columnSpan(1),
+
+                                TextInput::make('subtotal')
+                                    ->numeric()
+                                    ->disabled()
+                                    ->dehydrated(true)
+                                    ->columnSpan(1),
+                            ]),
+                        ])
+                        ->defaultItems(1)
+                        ->minItems(1)
+                        ->columns(1)
+                        ->collapsible()
+                        ->itemLabel(fn (array $state): ?string =>
+                            self::filaLabel($state)
+                        ),
+                ])
+                ->collapsed(false) // siempre expandido
+                ->columnSpanFull(), // 👈 ocupa toda la fila, sin compartir espacio
 
 
-                Repeater::make('detalles')
-                    ->relationship('detalles') // 👈 relación en el modelo Pedido
-                    ->label('Detalles del pedido')
-                    ->schema([
-                        Select::make('producto_id')
-                            ->label('Producto')
-                            ->relationship('producto', 'nombre_producto')
-                            ->searchable()
-                            ->required()
-                            ->preload()
-                            ->live()
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, $get) {
-                                if (! $state) {
-                                    $set('precio_unitario', 0);
-                                    $set('total', 0);
-                                    return;
-                                }
+        ]);
+    }
 
-                                // Buscar el producto en DB
-                                $producto = Producto::find($state);
-                                if (! $producto) {
-                                    return;
-                                }
 
-                                // 👇 Obtenemos el tipo de precio desde el formulario padre
-                                $tipoPrecio = $get('../../tipo_precio') ?? 'DETAL';
+    /**
+     * 🔹 Recalcular toda la tabla (cuando cambia tipo_precio).
+     */
+    private static function recalcularTodo(callable $set, callable $get, string $tipoPrecio): void
+    {
+        $detalles = $get('detalles') ?? [];
+        $subtotalGeneral = 0;
 
-                                $precio = match ($tipoPrecio) {
-                                    'MAYORISTA'  => $producto->valor_mayorista_producto ?? 0,
-                                    'FERRETERO'  => $producto->valor_ferretero_producto ?? 0,
-                                    default      => $producto->valor_detal_producto ?? 0,
-                                };
+        foreach ($detalles as $index => $detalle) {
+            if (! $detalle['producto_id']) {
+                continue;
+            }
 
-                                $set('precio_unitario', $precio);
-                                $set('total', ($get('cantidad') ?: 0) * $precio);
+            $producto = Producto::find($detalle['producto_id']);
+            if (! $producto) {
+                continue;
+            }
 
-                                // 👇 recalcular subtotal
-                                $detalles = $get('../../detalles') ?? [];
-                                $subtotal = collect($detalles)->sum(fn($d) => $d['total'] ?? 0);
-                                $set('../../subtotal', $subtotal);
-                            }),
+            $precio = $producto->getPrecioPorTipo($tipoPrecio);
+            $cantidad = $detalle['cantidad'] ?? 0;
+            $subtotal = $cantidad * $precio;
 
-                        TextInput::make('cantidad')
-                            ->numeric()
-                            ->default(1)
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, $get) {
-                                $total = ($state ?: 0) * ($get('precio_unitario') ?: 0);
-                                $set('total', $total);
+            $set("detalles.$index.precio_unitario", $precio);
+            $set("detalles.$index.subtotal", $subtotal);
 
-                                // 👇 recalcular subtotal
-                                $detalles = $get('../../detalles') ?? [];
-                                $subtotal = collect($detalles)->sum(fn($d) => $d['total'] ?? 0);
-                                $set('../../subtotal', $subtotal);
-                            })
-                            ->afterStateHydrated(function ($state, callable $set, $get) {
-                                // 👇 al hidratar, calcular total inicial
-                                $total = ($state ?: 0) * ($get('precio_unitario') ?: 0);
-                                $set('total', $total);
-                            }),
+            $subtotalGeneral += $subtotal;
+        }
 
-                        TextInput::make('precio_unitario')
-                            ->numeric()
-                            ->default(0)
-                            ->required()
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, $get) {
-                                $total = ($get('cantidad') ?: 0) * ($state ?: 0);
-                                $set('total', $total);
+        $set('subtotal', $subtotalGeneral);
+    }
 
-                                // 👇 recalcular subtotal
-                                $detalles = $get('../../detalles') ?? [];
-                                $subtotal = collect($detalles)->sum(fn($d) => $d['total'] ?? 0);
-                                $set('../../subtotal', $subtotal);
-                            })
-                            ->afterStateHydrated(function ($state, callable $set, $get) {
-                                // 👇 al hidratar, calcular total inicial
-                                $total = ($get('cantidad') ?: 0) * ($state ?: 0);
-                                $set('total', $total);
-                            }),
+    /**
+     * 🔹 Recalcular una fila (producto, cantidad o precio).
+     */
+    private static function recalcularFila(callable $set, callable $get, string $tipoPrecio): void
+    {
+        $productoId = $get('producto_id');
+        $cantidad   = $get('cantidad') ?? 0;
+        $precio     = $get('precio_unitario') ?? 0;
 
-                        TextInput::make('total')
-                            ->numeric()
-                            ->disabled()
-                            ->dehydrated(true)
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, callable $set, $get) {
-                                $detalles = $get('../../detalles') ?? [];
-                                $subtotal = collect($detalles)->sum(fn($d) => $d['total'] ?? 0);
-                                $set('../../subtotal', $subtotal);
-                            }),
-                    ])
-                    ->defaultItems(1) // empieza con un ítem por defecto
-                    ->minItems(1)
-                    ->columns(4)
-                    ->collapsible()
-                    ->itemLabel(function (array $state): ?string {
-                        $cantidad = $state['cantidad'] ?? 0;
-                        $precio = $state['precio_unitario'] ?? 0;
-                        $total  = $state['total'] ?? ($cantidad * $precio);
+        if ($productoId) {
+            $producto = Producto::find($productoId);
+            if ($producto) {
+                $precio = $producto->getPrecioPorTipo($tipoPrecio);
+                $set('precio_unitario', $precio);
+            }
+        }
 
-                        // si tenemos el producto id, intentamos obtener nombre (si no, mostramos texto genérico)
-                        $nombre = 'Sin producto';
-                        if (! empty($state['producto_id'])) {
-                            $p = Producto::find($state['producto_id']);
-                            $nombre = $p ? ($p->nombre_producto ?? $p->id) : 'Producto #' . $state['producto_id'];
-                        }
+        $subtotal = $cantidad * $precio;
+        $set('subtotal', $subtotal);
 
-                        return "{$cantidad} x {$nombre} | {$precio} = {$total}";
-                    })
-            ]);
+        // 🔹 Recalcular total general
+        $detalles = $get('../../detalles') ?? [];
+        $totalPedido = collect($detalles)->sum(fn ($d) => $d['subtotal'] ?? 0);
+        $set('../../subtotal', $totalPedido);
+    }
+
+    /**
+     * 🔹 Etiqueta de la fila colapsada.
+     */
+    private static function filaLabel(array $state): string
+    {
+        $cantidad = $state['cantidad'] ?? 0;
+        $precio   = $state['precio_unitario'] ?? 0;
+        $total    = $state['subtotal'] ?? ($cantidad * $precio);
+
+        $nombre = 'Sin producto';
+        if (! empty($state['producto_id'])) {
+            $p = Producto::find($state['producto_id']);
+            $nombre = $p ? $p->nombre_producto : "Producto #{$state['producto_id']}";
+        }
+
+        return "{$cantidad} x {$nombre} | {$precio} = {$total}";
     }
 }

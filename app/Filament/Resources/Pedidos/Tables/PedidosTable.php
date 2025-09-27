@@ -33,7 +33,8 @@ class PedidosTable
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('codigo')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('cliente.razon_social')
                     ->numeric()
                     ->sortable(),
