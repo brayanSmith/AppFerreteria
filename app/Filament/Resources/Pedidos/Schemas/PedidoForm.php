@@ -13,6 +13,8 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use App\Models\Producto;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\RawJs;
 
 class PedidoForm
 {
@@ -27,7 +29,7 @@ class PedidoForm
                     TextInput::make('codigo')
                         ->disabled()
                         ->columnSpan(1),
-                    
+
                     Select::make('cliente_id')
                         ->label('Cliente')
                         ->relationship('cliente', 'razon_social')
@@ -73,23 +75,27 @@ class PedidoForm
                         ->grouped()
                         ->required()
                         ->reactive()
-                        ->afterStateUpdated(fn ($state, $set, $get) =>
+                        ->afterStateUpdated(
+                            fn($state, $set, $get) =>
                             self::recalcularTodo($set, $get, $state)
                         )
                         ->columnSpan(1),
                 ]),
 
-                // 🔹 Totales
+            // 🔹 Totales
             Section::make('Resumen')
-                ->schema([
-                    TextInput::make('subtotal')
-                        ->label('Subtotal general')
-                        ->numeric()
-                        ->default(0.0)
-                        ->disabled()
-                        ->dehydrated(true),
-                ])
-                ->columnSpan(1),
+    ->schema([
+        TextInput::make('subtotal')
+            ->prefix('$')
+            ->inputMode('decimal')
+            ->readOnly()
+            ->formatStateUsing(fn($state) => number_format((float)$state, 0, ',', '.')),
+
+        /*TextEntry::make('subtotal')
+            ->prefix('$')
+            ->state(fn($get) => number_format((float)($get('subtotal') ?? 0), 2, ',', '.')),*/
+    ])
+    ->columnSpan(1),
 
             // 🔹 Comentarios
             Section::make('Comentarios')
@@ -119,7 +125,8 @@ class PedidoForm
                                     ->required()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                    ->afterStateUpdated(
+                                        fn($state, $set, $get) =>
                                         self::recalcularFila($set, $get, $get('../../tipo_precio'))
                                     )
                                     ->columnSpan(2),
@@ -129,7 +136,8 @@ class PedidoForm
                                     ->default(1)
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                    ->afterStateUpdated(
+                                        fn($state, $set, $get) =>
                                         self::recalcularFila($set, $get, $get('../../tipo_precio'))
                                     )
                                     ->columnSpan(1),
@@ -139,7 +147,8 @@ class PedidoForm
                                     ->default(0)
                                     ->required()
                                     ->reactive()
-                                    ->afterStateUpdated(fn ($state, $set, $get) =>
+                                    ->afterStateUpdated(
+                                        fn($state, $set, $get) =>
                                         self::recalcularFila($set, $get, $get('../../tipo_precio'))
                                     )
                                     ->columnSpan(1),
@@ -155,9 +164,13 @@ class PedidoForm
                         ->minItems(1)
                         ->columns(1)
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string =>
+                        ->itemLabel(
+                            fn(array $state): ?string =>
                             self::filaLabel($state)
-                        ),
+                        )
+                        ->afterStateUpdated(function ($set, $get) {
+                            self::recalcularTodo($set, $get, $get('tipo_precio'));
+                        }),
                 ])
                 ->collapsed(false) // siempre expandido
                 ->columnSpanFull(), // 👈 ocupa toda la fila, sin compartir espacio
@@ -220,7 +233,7 @@ class PedidoForm
 
         // 🔹 Recalcular total general
         $detalles = $get('../../detalles') ?? [];
-        $totalPedido = collect($detalles)->sum(fn ($d) => $d['subtotal'] ?? 0);
+        $totalPedido = collect($detalles)->sum(fn($d) => $d['subtotal'] ?? 0);
         $set('../../subtotal', $totalPedido);
     }
 
@@ -231,7 +244,7 @@ class PedidoForm
     {
         $cantidad = $state['cantidad'] ?? 0;
         $precio   = $state['precio_unitario'] ?? 0;
-        $total    = $state['subtotal'] ?? ($cantidad * $precio);
+        $total    = $state['subtotal'] ?? ($cantidad * $precio); // por si no se ha calculado aún
 
         $nombre = 'Sin producto';
         if (! empty($state['producto_id'])) {
