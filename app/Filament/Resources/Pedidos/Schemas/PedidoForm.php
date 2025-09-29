@@ -13,6 +13,7 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use App\Models\Producto;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\RawJs;
 
@@ -84,18 +85,16 @@ class PedidoForm
 
             // 🔹 Totales
             Section::make('Resumen')
-    ->schema([
-        TextInput::make('subtotal')
-            ->prefix('$')
-            ->inputMode('decimal')
-            ->readOnly()
-            ->formatStateUsing(fn($state) => number_format((float)$state, 0, ',', '.')),
-
-        /*TextEntry::make('subtotal')
-            ->prefix('$')
-            ->state(fn($get) => number_format((float)($get('subtotal') ?? 0), 2, ',', '.')),*/
-    ])
-    ->columnSpan(1),
+                ->schema([
+                    TextInput::make('subtotal')
+                        ->prefix('$')
+                        ->inputMode('decimal')
+                        ->readOnly()
+                        ->mask(RawJs::make('$money($input)'))
+                        ->stripCharacters(',')
+                        ->numeric(),
+                ])
+                ->columnSpan(1),
 
             // 🔹 Comentarios
             Section::make('Comentarios')
@@ -112,71 +111,79 @@ class PedidoForm
 
             // 🚨 Detalles del pedido (ocupa ancho completo)
             Section::make('Detalles del pedido')
+            ->columnSpanFull() // 👈 ocupa toda la fila, sin compartir espacio
                 ->schema([
                     Repeater::make('detalles')
                         ->relationship('detalles')
                         ->label('Productos')
-                        ->schema([
-                            Grid::make(5)->schema([
-                                Select::make('producto_id')
-                                    ->label('Producto')
-                                    ->relationship('producto', 'nombre_producto')
-                                    ->searchable()
-                                    ->required()
-                                    ->preload()
-                                    ->reactive()
-                                    ->afterStateUpdated(
-                                        fn($state, $set, $get) =>
-                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
-                                    )
-                                    ->columnSpan(2),
-
-                                TextInput::make('cantidad')
-                                    ->numeric()
-                                    ->default(1)
-                                    ->required()
-                                    ->reactive()
-                                    ->afterStateUpdated(
-                                        fn($state, $set, $get) =>
-                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
-                                    )
-                                    ->columnSpan(1),
-
-                                TextInput::make('precio_unitario')
-                                    ->numeric()
-                                    ->default(0)
-                                    ->required()
-                                    ->reactive()
-                                    ->afterStateUpdated(
-                                        fn($state, $set, $get) =>
-                                        self::recalcularFila($set, $get, $get('../../tipo_precio'))
-                                    )
-                                    ->columnSpan(1),
-
-                                TextInput::make('subtotal')
-                                    ->numeric()
-                                    ->disabled()
-                                    ->dehydrated(true)
-                                    ->columnSpan(1),
-                            ]),
+                        ->table([
+                            // Define the columns for the table
+                            TableColumn::make('Producto')
+                                ->markAsRequired()
+                                ->width('200px'),
+                            TableColumn::make('Cantidad')
+                                ->markAsRequired()
+                                ->width('100px'),
+                            TableColumn::make('Precio Unitario')
+                                ->markAsRequired()
+                                ->width('100px'),
+                            TableColumn::make('Subtotal')
+                                ->markAsRequired()
+                                ->width('100px'),
+                            TableColumn::make('Acciones')
+                            ->width('10px'),
                         ])
-                        ->defaultItems(1)
-                        ->minItems(1)
-                        ->columns(1)
-                        ->collapsible()
-                        ->itemLabel(
-                            fn(array $state): ?string =>
-                            self::filaLabel($state)
-                        )
-                        ->afterStateUpdated(function ($set, $get) {
-                            self::recalcularTodo($set, $get, $get('tipo_precio'));
-                        }),
+
+                        ->schema([
+                            Select::make('producto_id')
+                                ->label('Producto')
+                                ->relationship('producto', 'nombre_producto')
+                                ->searchable()
+                                ->required()
+                                ->preload()
+                                ->reactive()
+                                ->afterStateUpdated(
+                                    fn($state, $set, $get) =>
+                                    self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                )
+                                ->columnSpan(2),
+
+                            TextInput::make('cantidad')
+                                ->numeric()
+                                ->default(1)
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(
+                                    fn($state, $set, $get) =>
+                                    self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                )
+                                ->columnSpan(1),
+
+                            TextInput::make('precio_unitario')
+                                ->prefix('$')
+                                ->numeric()
+                                ->default(0)
+                                ->required()
+                                ->reactive()
+                                ->afterStateUpdated(
+                                    fn($state, $set, $get) =>
+                                    self::recalcularFila($set, $get, $get('../../tipo_precio'))
+                                )
+                                ->columnSpan(1),
+
+                            TextInput::make('subtotal')
+                                ->prefix('$')
+                                ->numeric()
+                                ->disabled()
+                                ->dehydrated(true)
+                                ->columnSpan(1),
+                        ]),
                 ])
-                ->collapsed(false) // siempre expandido
-                ->columnSpanFull(), // 👈 ocupa toda la fila, sin compartir espacio
 
-
-        ]);
+                ->afterStateUpdated(function ($set, $get) {
+                    self::recalcularTodo($set, $get, $get('tipo_precio'));
+                }),
+            ]);
     }
 
 
