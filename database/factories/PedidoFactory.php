@@ -28,7 +28,7 @@ class PedidoFactory extends Factory
             'fecha_sola' => $this->faker->date(),
             'ciudad' => $this->faker->city(),
             'estado' => $this->faker->randomElement(['PENDIENTE', 'FACTURADO', 'ANULADO']),
-            'levantar_deuda' => $this->faker->boolean(),
+            'en_cartera' => $this->faker->boolean(),
             'metodo_pago' => $this->faker->randomElement(['A CREDITO', 'EFECTIVO']),
             'tipo_precio' => $this->faker->randomElement(['FERRETERO', 'MAYORISTA', 'DETAL']),
             'primer_comentario' => $this->faker->sentence(),

@@ -13,6 +13,8 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use App\Models\Producto;
+use DragonCode\PrettyArray\Services\File;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\RawJs;
@@ -111,7 +113,7 @@ class PedidoForm
 
             // 🚨 Detalles del pedido (ocupa ancho completo)
             Section::make('Detalles del pedido')
-            ->columnSpanFull() // 👈 ocupa toda la fila, sin compartir espacio
+                ->columnSpanFull() // 👈 ocupa toda la fila, sin compartir espacio
                 ->schema([
                     Repeater::make('detalles')
                         ->relationship('detalles')
@@ -131,7 +133,7 @@ class PedidoForm
                                 ->markAsRequired()
                                 ->width('100px'),
                             TableColumn::make('Acciones')
-                            ->width('10px'),
+                                ->width('10px'),
                         ])
 
                         ->schema([
@@ -161,6 +163,7 @@ class PedidoForm
 
                             TextInput::make('precio_unitario')
                                 ->prefix('$')
+                                ->mask(RawJs::make('$money($input)'))
                                 ->numeric()
                                 ->default(0)
                                 ->required()
@@ -173,19 +176,94 @@ class PedidoForm
 
                             TextInput::make('subtotal')
                                 ->prefix('$')
+                                ->mask(RawJs::make('$money($input)'))
                                 ->numeric()
                                 ->disabled()
                                 ->dehydrated(true)
                                 ->columnSpan(1),
                         ]),
                 ])
-
                 ->afterStateUpdated(function ($set, $get) {
                     self::recalcularTodo($set, $get, $get('tipo_precio'));
                 }),
-            ]);
-    }
 
+            Section::make('Abonos')
+                ->columnSpanFull()
+                ->schema([
+                    Repeater::make('abonos')
+                        ->relationship('abonoPedido')
+                        ->label('Abonos realizados')
+                        ->schema([
+
+                            // 👉 Definimos 2 columnas principales
+                            // Columna izquierda: datos
+                            Section::make('Datos del abono')
+                                ->schema([
+                                    DateTimePicker::make('fecha')
+                                        ->label('Fecha')
+                                        ->required()
+                                        ->default(now())
+                                        ->columnSpan(1),
+
+                                    TextInput::make('monto')
+                                        ->label('Monto')
+                                        ->prefix('$')
+                                        ->inputMode('decimal')
+                                        ->required()
+                                        ->mask(RawJs::make('$money($input)'))
+                                        ->stripCharacters(',')
+                                        ->numeric()
+                                        ->columnSpan(1),
+
+                                    Select::make('forma_pago')
+                                        ->label('Forma de pago')
+                                        ->options([
+                                            'EFECTIVO'      => 'Efectivo',
+                                            'TARJETA'       => 'Tarjeta',
+                                            'NEQUI'         => 'Nequi',
+                                            'DAVIPLATA'     => 'Daviplata',
+                                            'PSE'           => 'PSE',
+                                            'TRANSFERENCIA' => 'Transferencia',
+                                            'OTRO'          => 'Otro',
+                                        ])
+                                        ->required()
+                                        ->columnSpan(1),
+
+                                    Textarea::make('descripcion')
+                                        ->label('Descripción')
+                                        ->default(null)
+                                        ->columnSpan(2),
+
+                                    Select::make('user_id')
+                                        ->label('Usuario que registra')
+                                        ->relationship('user', 'name')
+                                        ->searchable()
+                                        ->preload()
+                                        ->required()
+                                        ->columnSpan(1),
+                                ])
+                                ->columns(3) // 👉 organiza fecha, monto y forma de pago en 3 columnas
+                                ->columnSpan(2), // ocupa la mitad izquierda del grid
+
+                            // Columna derecha: soporte
+                            Section::make('Soporte')
+                                ->schema([
+                                    FileUpload::make('imagen')
+                                        ->label('Comprobante o evidencia')
+                                        ->directory('abonos')
+                                        ->image()
+                                        ->imagePreviewHeight('200')
+                                        ->columnSpanFull(),
+                                ])
+                                ->columnSpan(1), // ocupa la mitad derecha del grid
+                        ])
+                        ->columns(3) // 👉 el repeater distribuye en 3 columnas: 2 (datos) + 1 (soporte)
+                        ->columnSpan(4)
+                        ->disabled(fn($get) => $get('estado') === 'ANULADO')
+                        ->hidden(fn($get) => $get('estado') === 'ANULADO'),
+                ])
+        ]);
+    }
 
     /**
      * 🔹 Recalcular toda la tabla (cuando cambia tipo_precio).
@@ -243,7 +321,6 @@ class PedidoForm
         $totalPedido = collect($detalles)->sum(fn($d) => $d['subtotal'] ?? 0);
         $set('../../subtotal', $totalPedido);
     }
-
     /**
      * 🔹 Etiqueta de la fila colapsada.
      */

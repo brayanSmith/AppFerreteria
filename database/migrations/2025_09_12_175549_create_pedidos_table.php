@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('fecha_sola')->default(DB::raw('CURRENT_DATE'));
             $table->string('ciudad')->nullable();
             $table->enum('estado', ['PENDIENTE', 'FACTURADO', 'ANULADO'])->default('PENDIENTE');
-            $table->boolean('levantar_deuda')->default(false);
+            $table->boolean('en_cartera')->default(false);
             $table->enum('metodo_pago', ['A CREDITO', 'EFECTIVO'])->default('A CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
             $table->text('primer_comentario')->nullable();

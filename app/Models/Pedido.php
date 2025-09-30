@@ -22,7 +22,7 @@ class Pedido extends Model
         'primer_comentario',
         'segundo_comentario',
         'subtotal',
-        'levantar_deuda',
+        'en_cartera',
     ];
 
     protected $casts = [
@@ -36,6 +36,10 @@ class Pedido extends Model
     public function detalles()
     {
         return $this->hasMany(DetallePedido::class);
+    }
+    public function abonoPedido()
+    {
+        return $this->hasOne(Abono::class);
     }
 
      /**
