@@ -192,10 +192,13 @@ class PedidoForm
                 ->schema([
                     Repeater::make('abonos')
                         ->relationship('abonoPedido')
-                        ->label('Abonos realizados')
+                        ->label(function ($get) {
+                            $abonos = $get('abonos') ?? [];
+                            $total = collect($abonos)->sum(fn($abono) => (float) ($abono['monto'] ?? 0));
+                            return 'Abonos realizados (Total: $' . number_format($total, 0, ',', '.') . ')';
+                        })
                         ->schema([
 
-                            // 👉 Definimos 2 columnas principales
                             // Columna izquierda: datos
                             Section::make('Datos del abono')
                                 ->schema([
@@ -210,8 +213,8 @@ class PedidoForm
                                         ->prefix('$')
                                         ->inputMode('decimal')
                                         ->required()
-                                        ->mask(RawJs::make('$money($input)'))
-                                        ->stripCharacters(',')
+                                        //->mask(RawJs::make('$money($input)'))
+                                        ->stripCharacters('.')
                                         ->numeric()
                                         ->columnSpan(1),
 
@@ -242,8 +245,8 @@ class PedidoForm
                                         ->required()
                                         ->columnSpan(1),
                                 ])
-                                ->columns(3) // 👉 organiza fecha, monto y forma de pago en 3 columnas
-                                ->columnSpan(2), // ocupa la mitad izquierda del grid
+                                ->columns(3)
+                                ->columnSpan(2),
 
                             // Columna derecha: soporte
                             Section::make('Soporte')
@@ -255,13 +258,14 @@ class PedidoForm
                                         ->imagePreviewHeight('200')
                                         ->columnSpanFull(),
                                 ])
-                                ->columnSpan(1), // ocupa la mitad derecha del grid
+                                ->columnSpan(1),
                         ])
-                        ->columns(3) // 👉 el repeater distribuye en 3 columnas: 2 (datos) + 1 (soporte)
+                        ->columns(3)
                         ->columnSpan(4)
                         ->disabled(fn($get) => $get('estado') === 'ANULADO')
                         ->hidden(fn($get) => $get('estado') === 'ANULADO'),
                 ])
+
         ]);
     }
 
