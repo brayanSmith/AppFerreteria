@@ -4,9 +4,9 @@ namespace App\Forms\Components;
 
 use Filament\Forms\Components\TextInput;
 
-class MoneyInput extends TextInput
+class MoneyInpute extends TextInput
 {
-    protected string $view = 'filament.forms.components.money-input';
+    protected string $view = 'filament.forms.components.money-inpute';
 
     /**
      * Create a new MoneyInput instance.
@@ -18,7 +18,7 @@ class MoneyInput extends TextInput
     public static function make(?string $name = null): static
     {
         return parent::make($name)
-            ->extraAttributes(['class' => 'filament-money-input']);
+            ->extraAttributes(['class' => 'filament-money-inpute']);
     }
 
     // Puedes añadir helpers adicionales si los necesitas

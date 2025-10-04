@@ -31,6 +31,7 @@ class PedidoFactory extends Factory
             'en_cartera' => $this->faker->boolean(),
             'metodo_pago' => $this->faker->randomElement(['A CREDITO', 'EFECTIVO']),
             'tipo_precio' => $this->faker->randomElement(['FERRETERO', 'MAYORISTA', 'DETAL']),
+            'tipo_venta' => $this->faker->randomElement(['ELECTRICA', 'REMISIONADA']),
             'primer_comentario' => $this->faker->sentence(),
             'segundo_comentario' => $this->faker->optional()->sentence(),
             'subtotal' => 0, // lo calcularemos con los detalles

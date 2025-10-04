@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Pedidos\Schemas;
 
+use App\Forms\Components\MoneyInput;
+use App\Forms\Components\MoneyInpute;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -18,6 +21,8 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\RawJs;
+use PhpParser\Node\Stmt\Label;
+
 
 class PedidoForm
 {
@@ -89,12 +94,25 @@ class PedidoForm
             Section::make('Resumen')
                 ->schema([
                     TextInput::make('subtotal')
+                        ->currencyMask(".", ",", 0)
                         ->prefix('$')
-                        ->inputMode('decimal')
                         ->readOnly()
-                        ->mask(RawJs::make('$money($input)'))
-                        ->stripCharacters(',')
                         ->numeric(),
+                    TextInput::make('abono')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->numeric(),
+                    TextInput::make('descuento')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->numeric(),
+
+                    TextInput::make('restante')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->readOnly()
+                        ->numeric(),
+
                 ])
                 ->columnSpan(1),
 
@@ -117,7 +135,13 @@ class PedidoForm
                 ->schema([
                     Repeater::make('detalles')
                         ->relationship('detalles')
-                        ->label('Productos')
+                        ->label(function ($get) {
+                            $detalles = $get('detalles') ?? [];
+                            $total = collect($detalles)->sum(callback: fn($detalle) => (float) ($detalle['subtotal'] ?? 0));
+                            return 'Productos añadidos (Total: $' . number_format($total, 0, ',', '.') . ')';
+                        })
+
+
                         ->table([
                             // Define the columns for the table
                             TableColumn::make('Producto')
@@ -266,6 +290,10 @@ class PedidoForm
                         ->hidden(fn($get) => $get('estado') === 'ANULADO'),
                 ])
 
+                ->afterStateUpdated(function ($set, $get) {
+                    self::recalcularAbonos($set, $get);
+                })
+
         ]);
     }
 
@@ -278,14 +306,10 @@ class PedidoForm
         $subtotalGeneral = 0;
 
         foreach ($detalles as $index => $detalle) {
-            if (! $detalle['producto_id']) {
-                continue;
-            }
+            if (! $detalle['producto_id']) continue;
 
             $producto = Producto::find($detalle['producto_id']);
-            if (! $producto) {
-                continue;
-            }
+            if (! $producto) continue;
 
             $precio = $producto->getPrecioPorTipo($tipoPrecio);
             $cantidad = $detalle['cantidad'] ?? 0;
@@ -298,7 +322,11 @@ class PedidoForm
         }
 
         $set('subtotal', $subtotalGeneral);
+
+        // 👇 recalcular abonos y restante también
+        self::recalcularAbonos($set, $get);
     }
+
 
     /**
      * 🔹 Recalcular una fila (producto, cantidad o precio).
@@ -325,21 +353,19 @@ class PedidoForm
         $totalPedido = collect($detalles)->sum(fn($d) => $d['subtotal'] ?? 0);
         $set('../../subtotal', $totalPedido);
     }
-    /**
-     * 🔹 Etiqueta de la fila colapsada.
-     */
-    private static function filaLabel(array $state): string
+    private static function recalcularAbonos(callable $set, callable $get): void
     {
-        $cantidad = $state['cantidad'] ?? 0;
-        $precio   = $state['precio_unitario'] ?? 0;
-        $total    = $state['subtotal'] ?? ($cantidad * $precio); // por si no se ha calculado aún
+        $abonos = $get('abonos') ?? [];
+        $totalAbonos = collect($abonos)->sum(fn($abono) => (float) ($abono['monto'] ?? 0));
 
-        $nombre = 'Sin producto';
-        if (! empty($state['producto_id'])) {
-            $p = Producto::find($state['producto_id']);
-            $nombre = $p ? $p->nombre_producto : "Producto #{$state['producto_id']}";
-        }
+        $set('abono', $totalAbonos);
 
-        return "{$cantidad} x {$nombre} | {$precio} = {$total}";
+        // 🔹 Recalcular restante = subtotal - abono
+        $subtotal = (float) ($get('subtotal') ?? 0);
+        $restante = $subtotal - $totalAbonos;
+        $set('restante', $restante);
+
+        // 🔹 Total general si quieres mostrarlo explícitamente
+        $set('total_general', $subtotal);
     }
 }

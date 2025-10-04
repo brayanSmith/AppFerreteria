@@ -12,8 +12,8 @@
         id="{{ $id }}_visual"
         type="text"
         value="{{ $formatted }}"
-        @if($disabled) disabled @endif
+        {{-- @if($disabled) disabled @endif --}}
         readonly
-        class="filament-money-input__visual"
+        class="filament-money-inpute__visual"
     />
 </div>

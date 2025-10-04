@@ -23,9 +23,14 @@ return new class extends Migration
             $table->boolean('en_cartera')->default(false);
             $table->enum('metodo_pago', ['A CREDITO', 'EFECTIVO'])->default('A CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
+            $table->enum('tipo_venta', ['ELECTRICA','REMISIONADA'])->default('ELECTRICA');
             $table->text('primer_comentario')->nullable();
             $table->text('segundo_comentario')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);
+            $table->decimal('abono', 12, 2)->default(0);
+            $table->decimal('descuento', 12, 2)->default(0);
+            $table->decimal('restante', 12, 2)->default(0);
+            $table->decimal('total_general', 12, 2)->default(0);
             $table->timestamps();
         });
     }
