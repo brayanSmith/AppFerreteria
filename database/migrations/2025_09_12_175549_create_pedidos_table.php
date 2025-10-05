@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('codigo')->unique()->nullable();
             $table->foreignId('cliente_id')->constrained('clientes');
             $table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->date('fecha_sola')->default(DB::raw('CURRENT_DATE'));
+            $table->date('fecha_vencimiento')->nullable();
             $table->string('ciudad')->nullable();
             $table->enum('estado', ['PENDIENTE', 'FACTURADO', 'ANULADO'])->default('PENDIENTE');
             $table->boolean('en_cartera')->default(false);
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->text('segundo_comentario')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);
             $table->decimal('abono', 12, 2)->default(0);
-            $table->decimal('descuento', 12, 2)->default(0);
-            $table->decimal('restante', 12, 2)->default(0);
-            $table->decimal('total_general', 12, 2)->default(0);
+            $table->decimal('descuento', 12, 2)->default(0)->nullable();
+            $table->decimal('total_a_pagar', 12, 2)->default(0);
+            $table->integer('contador_impresiones')->default(0);
             $table->timestamps();
         });
     }

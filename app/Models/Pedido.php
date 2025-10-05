@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,7 +15,7 @@ class Pedido extends Model
         'codigo',
         'cliente_id',
         'fecha',
-        'fecha_sola',
+        'fecha_vencimiento',
         'ciudad',
         'estado',
         'metodo_pago',
@@ -25,14 +26,14 @@ class Pedido extends Model
         'subtotal',
         'en_cartera',
         'abono',
-        'restante',
         'descuento',
-        'total_general',
+        'total_a_pagar',
+        'contador_impresiones',
     ];
 
     protected $casts = [
         'fecha' => 'datetime',
-        'fecha_sola' => 'date',
+        'fecha_vencimiento' => 'date',
     ];
     public function cliente()
     {
@@ -53,26 +54,52 @@ class Pedido extends Model
     public function recalcularTotales(): void
     {
         $subtotal = $this->detalles()->sum('subtotal');
-        $this->saveQuietly(); // 👈 evita disparar eventos otra vez
         $this->subtotal = $subtotal;
+        // Recalcular totales dependientes
+        $this->recalcularTotalAPagar();
     }
 
-    Public function recalcularAbono(): void
+    public function recalcularAbono(): void
     {
         $abonos = $this->abonoPedido()->sum('monto');
-        $this->restante = $this->subtotal - $abonos;
-        $this->saveQuietly(); // 👈 evita disparar eventos otra vez
+        $this->abono = $abonos;
+        // Recalcular el total a pagar teniendo en cuenta descuento y abonos
+        $this->recalcularTotalAPagar();
     }
 
-    public function recalcularTotalGeneral(): void
+    public function aplicarDescuento(float $monto): void
     {
-        $total_general = $this->detalles()->sum('subtotal');
-        $abonos = $this->abonoPedido()->sum('monto');
-        $descuento = $this->descuento;
-        $this->restante = $total_general - $abonos;
-        $this->total_general = $total_general - $descuento;
-        $this->saveQuietly(); // 👈 evita disparar eventos otra vez
+        $this->descuento = $monto;
+        // Recalcular el total a pagar después de aplicar descuento
+        $this->recalcularTotalAPagar();
     }
+
+    /**
+     * Recalcula y guarda el campo `total_a_pagar`.
+     *
+     * Lógica: total_a_pagar = subtotal - descuento - abonos
+     */
+    public function recalcularTotalAPagar(): void
+    {
+        $abonos = $this->abonoPedido()->sum('monto') ?? 0;
+
+        $subtotal = (float) ($this->subtotal ?? 0);
+        $descuento = (float) ($this->descuento ?? 0);
+
+    $calculated = $subtotal - $descuento - $abonos;
+    $this->total_a_pagar = $calculated < 0 ? 0 : $calculated;
+        // Guardamos también el acumulado de abonos en el campo `abono`
+        $this->abono = $abonos;
+
+        $this->saveQuietly(); // evita disparar eventos otra vez
+    }
+
+     /**
+     * The "booted" method of the model.
+     *
+     * Here we set the 'codigo' field after the model is created.
+     */
+
 
     protected static function booted()
     {

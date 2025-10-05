@@ -2,26 +2,19 @@
 
 namespace App\Filament\Resources\Pedidos\Schemas;
 
-use App\Forms\Components\MoneyInput;
-use App\Forms\Components\MoneyInpute;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\ToggleButtons;
-
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-use App\Models\Producto;
-use DragonCode\PrettyArray\Services\File;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Support\RawJs;
-use PhpParser\Node\Stmt\Label;
+use App\Models\Producto;
 
 
 class PedidoForm
@@ -32,7 +25,7 @@ class PedidoForm
 
             // 🔹 Datos generales del pedido
             Section::make('Datos del pedido')
-                ->columns(3)
+                ->columns(4)
                 ->schema([
                     TextInput::make('codigo')
                         ->disabled()
@@ -44,15 +37,21 @@ class PedidoForm
                         ->searchable()
                         ->required()
                         ->preload()
+                        ->columnSpan(3),
+
+                    DatePicker::make('fecha')
+                        ->label('Fecha Registro')
+                        ->required()
                         ->columnSpan(2),
 
-                    DateTimePicker::make('fecha')
-                        ->required()
-                        ->columnSpan(1),
+                    DatePicker::make('fecha_vencimiento')
+                        ->label('Fecha de vencimiento')
+                        ->default(null)
+                        ->columnSpan(2),
 
                     TextInput::make('ciudad')
                         ->default(null)
-                        ->columnSpan(1),
+                        ->columnSpan(2),
 
                     Select::make('estado')
                         ->options([
@@ -62,7 +61,7 @@ class PedidoForm
                         ])
                         ->default('PENDIENTE')
                         ->required()
-                        ->columnSpan(1),
+                        ->columnSpan(2),
 
                     Select::make('metodo_pago')
                         ->options([
@@ -71,7 +70,7 @@ class PedidoForm
                         ])
                         ->default('A CREDITO')
                         ->required()
-                        ->columnSpan(1),
+                        ->columnSpan(2),
 
                     ToggleButtons::make('tipo_precio')
                         ->options([
@@ -101,13 +100,17 @@ class PedidoForm
                     TextInput::make('abono')
                         ->prefix('$')
                         ->currencyMask(".", ",", 0)
-                        ->numeric(),
+                        ->numeric()
+                        ->readOnly(),
                     TextInput::make('descuento')
                         ->prefix('$')
                         ->currencyMask(".", ",", 0)
-                        ->numeric(),
+                        ->numeric()
+                        ->live()
+                        ->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
 
-                    TextInput::make('restante')
+                    TextInput::make('total_a_pagar')
+                        ->label('Total a pagar')
                         ->prefix('$')
                         ->currencyMask(".", ",", 0)
                         ->readOnly()
@@ -118,6 +121,7 @@ class PedidoForm
 
             // 🔹 Comentarios
             Section::make('Comentarios')
+            ->columnSpanFull()
                 ->collapsed()
                 ->schema([
                     Textarea::make('primer_comentario')
@@ -152,6 +156,7 @@ class PedidoForm
                                 ->width('100px'),
                             TableColumn::make('Precio Unitario')
                                 ->markAsRequired()
+
                                 ->width('100px'),
                             TableColumn::make('Subtotal')
                                 ->markAsRequired()
@@ -236,6 +241,7 @@ class PedidoForm
                                         ->label('Monto')
                                         ->prefix('$')
                                         ->inputMode('decimal')
+                                        ->currencyMask(".", ",", 0)
                                         ->required()
                                         //->mask(RawJs::make('$money($input)'))
                                         ->stripCharacters('.')
@@ -323,7 +329,7 @@ class PedidoForm
 
         $set('subtotal', $subtotalGeneral);
 
-        // 👇 recalcular abonos y restante también
+    // 👇 recalcular abonos y total_a_pagar también
         self::recalcularAbonos($set, $get);
     }
 
@@ -360,12 +366,11 @@ class PedidoForm
 
         $set('abono', $totalAbonos);
 
-        // 🔹 Recalcular restante = subtotal - abono
+        // 🔹 Recalcular total_a_pagar = subtotal - descuento - abonos
         $subtotal = (float) ($get('subtotal') ?? 0);
-        $restante = $subtotal - $totalAbonos;
-        $set('restante', $restante);
+        $descuento = (float) ($get('descuento') ?? 0);
 
-        // 🔹 Total general si quieres mostrarlo explícitamente
-        $set('total_general', $subtotal);
+        $totalAPagar = $subtotal - $descuento - $totalAbonos;
+        $set('total_a_pagar', $totalAPagar);
     }
 }

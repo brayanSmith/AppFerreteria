@@ -21,11 +21,13 @@ class PedidoFactory extends Factory
      protected $model = Pedido::class;
     public function definition(): array
     {
+        $fechaVenc = $this->faker->optional()->dateTimeBetween('now', '+1 month');
+
         return [
             'codigo' => $this->faker->unique()->bothify('PED-####'),
             'cliente_id' => Cliente::factory(), // crea cliente si no existe
             'fecha' => $this->faker->dateTimeThisYear(),
-            'fecha_sola' => $this->faker->date(),
+            'fecha_vencimiento' => $fechaVenc ? $fechaVenc->format('Y-m-d') : null,
             'ciudad' => $this->faker->city(),
             'estado' => $this->faker->randomElement(['PENDIENTE', 'FACTURADO', 'ANULADO']),
             'en_cartera' => $this->faker->boolean(),
@@ -34,7 +36,11 @@ class PedidoFactory extends Factory
             'tipo_venta' => $this->faker->randomElement(['ELECTRICA', 'REMISIONADA']),
             'primer_comentario' => $this->faker->sentence(),
             'segundo_comentario' => $this->faker->optional()->sentence(),
-            'subtotal' => 0, // lo calcularemos con los detalles
+                'subtotal' => 0, // lo calcularemos con los detalles
+                'descuento' => 0,
+                'abono' => 0,
+                'total_a_pagar' => 0,
+
         ];
     }
 }
