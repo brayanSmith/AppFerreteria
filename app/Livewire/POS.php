@@ -38,8 +38,10 @@ class POS extends Component
     public $valor_decuento = 0; //
     public $metodo_pago = "A CREDITO";
     public $tipo_precio = "DETAL";
+    public $tipo_venta = "ELECTRICA";
 
     public $valor_producto = 0;
+
 
     // Comentarios
     public $primer_comentario = '';
@@ -49,6 +51,7 @@ class POS extends Component
     public $cantidad = 1;
 
     public $perPage = 10;
+    public $contador_impresiones = 0;
 
     public function mount()
     {
@@ -63,6 +66,7 @@ class POS extends Component
             $this->resetPage();
         }
     }
+
 
 
     #[Computed]
@@ -153,7 +157,7 @@ class POS extends Component
 
         if ($cantidad > $inventario->stock) {
             Notification::make()
-                ->title('Este Proucto esta fuera de Stock!')
+                ->title('Este Producto esta fuera de Stock!')
                 ->danger()
                 ->send();
             $this->cart[$productoId]['stock'] = $inventario->stock;
@@ -185,10 +189,13 @@ class POS extends Component
                 'estado' => 'PENDIENTE',
                 'metodo_pago' => $this->metodo_pago,
                 'tipo_precio' => $this->tipo_precio,
+                'tipo_venta' => $this->tipo_venta,
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
                 'subtotal' => $this->subtotal(),
                 'ciudad' => $this->ciudad,
+
+
             ]);
 
             //Crear Productos Vendidos
@@ -224,10 +231,10 @@ class POS extends Component
             $this->cliente_id = null;
             $this->metodo_pago = "A CREDITO";
             $this->tipo_precio = "DETAL";
+            $this->tipo_venta = "ELECTRICA";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
             $this->ciudad = '';
-
 
             // Guardar la URL del PDF en la sesión para mostrar el botón en la modal
             session(['pedido_pdf_url' => route('pedidos.pdf.download', $pedido->id)]);

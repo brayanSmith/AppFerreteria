@@ -33,7 +33,7 @@ class Pedido extends Model
 
     protected $casts = [
         'fecha' => 'datetime',
-        'fecha_vencimiento' => 'date',
+
     ];
     public function cliente()
     {

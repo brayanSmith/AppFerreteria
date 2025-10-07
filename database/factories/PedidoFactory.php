@@ -31,9 +31,9 @@ class PedidoFactory extends Factory
             'ciudad' => $this->faker->city(),
             'estado' => $this->faker->randomElement(['PENDIENTE', 'FACTURADO', 'ANULADO']),
             'en_cartera' => $this->faker->boolean(),
-            'metodo_pago' => $this->faker->randomElement(['A CREDITO', 'EFECTIVO']),
+            'metodo_pago' => $this->faker->randomElement(['CREDITO', 'CONTADO']),
             'tipo_precio' => $this->faker->randomElement(['FERRETERO', 'MAYORISTA', 'DETAL']),
-            'tipo_venta' => $this->faker->randomElement(['ELECTRICA', 'REMISIONADA']),
+            'tipo_venta' => $this->faker->randomElement(['ELECTRONICA', 'REMISIONADA']),
             'primer_comentario' => $this->faker->sentence(),
             'segundo_comentario' => $this->faker->optional()->sentence(),
                 'subtotal' => 0, // lo calcularemos con los detalles

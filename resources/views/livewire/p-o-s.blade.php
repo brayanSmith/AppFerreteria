@@ -27,10 +27,10 @@
                                 SKU: {{ $cartProduct['codigo_producto'] }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                COP: {{ number_format($this->getPrecioProducto($cartProduct), 2) }}
+                                COP: {{ number_format($this->getPrecioProducto($cartProduct), 0) }}
 
                                 <span class="font-bold">| TOTAL:</span>
-                                {{ number_format($this->getPrecioProducto($cartProduct) * $cartProduct['cantidad'], 2) }}
+                                {{ number_format($this->getPrecioProducto($cartProduct) * $cartProduct['cantidad'], 0) }}
                             </p>
 
                         </div>
@@ -94,21 +94,21 @@
                     <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Método de
                         Pago:</span>
                     <div class="flex space-x-2">
-                        <button type="button" wire:click="$set('metodo_pago', 'A CREDITO')"
+                        <button type="button" wire:click="$set('metodo_pago', 'CREDITO')"
                             class="px-4 py-2 rounded-full text-sm font-semibold border
                 transition
-                {{ $metodo_pago === 'A CREDITO'
+                {{ $metodo_pago === 'CREDITO'
                     ? 'bg-blue-600 text-white border-blue-600'
                     : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
-                            A CREDITO
+                            CRÉDITO
                         </button>
-                        <button type="button" wire:click="$set('metodo_pago', 'EFECTIVO')"
+                        <button type="button" wire:click="$set('metodo_pago', 'CONTADO')"
                             class="px-4 py-2 rounded-full text-sm font-semibold border
                 transition
-                {{ $metodo_pago === 'EFECTIVO'
+                {{ $metodo_pago === 'CONTADO'
                     ? 'bg-blue-600 text-white border-blue-600'
                     : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
-                            EFECTIVO
+                            CONTADO
                         </button>
                     </div>
                 </div>
@@ -142,8 +142,29 @@
                     </div>
                 </div>
 
+                {{-- ...Tipo de Venta... --}}
+                <div class="mt-4">
+                    <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de
+                        Venta:</span>
+                    <div class="flex space-x-2">
+                        <button type="button" wire:click="$set('tipo_venta', 'ELECTRONICA')"
+                            class="px-4 py-2 rounded-full text-sm font-semibold border transition
+            {{ $tipo_venta === 'ELECTRONICA'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                            ELECTRÓNICA
+                        </button>
+                        <button type="button" wire:click="$set('tipo_venta', 'REMISIONADA')"
+                            class="px-4 py-2 rounded-full text-sm font-semibold border transition
+            {{ $tipo_venta === 'REMISIONADA'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-200 dark:bg-neutral-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-neutral-600 hover:bg-blue-100 dark:hover:bg-blue-900' }}">
+                            REMISIONADA
+                        </button>
+                    </div>
+                </div>
 
-
+                {{-- Comentarios --}}
 
                 <div class="mt-4">
                     <label for="primer_comentario"
@@ -165,9 +186,10 @@
                 <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
 
                     <div class="flex justify-between items-center mb-2 text-lg font-bold">
-                        <span>Total a pagar:</span>
-                        <span>COP {{ number_format(num: $this->subtotal, decimals: 2) }}</span>
+                        <span>Total a Pagar:</span>
+                        <span>COP {{ number_format(num: $this->subtotal(), decimals: 0) }}</span>
                     </div>
+
                 </div>
             </div>
 
@@ -177,7 +199,7 @@
                     class="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg
                transition-colors duration-200 hover:bg-green-700
                disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
-                    Complete Sale
+                    Finalizar Venta
                 </button>
             </div>
         </div>
@@ -267,11 +289,11 @@
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
                                             {{ $product->codigo_producto }}</p>
                                         <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">DETAL:
-                                            {{ number_format($product->valor_detal_producto, 2) }}</p>
+                                            {{ number_format($product->valor_detal_producto, 0) }}</p>
                                         <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">FERRETERO:
-                                            {{ number_format($product->valor_ferretero_producto, 2) }}</p>
+                                            {{ number_format($product->valor_ferretero_producto, 0) }}</p>
                                         <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">MAYORISTA:
-                                            {{ number_format($product->valor_mayorista_producto, 2) }}</p>
+                                            {{ number_format($product->valor_mayorista_producto, 0) }}</p>
                                     </div>
 
                                     <!-- Columna 3: Botón -->

@@ -121,7 +121,7 @@ class PedidoForm
 
             // 🔹 Comentarios
             Section::make('Comentarios')
-            ->columnSpanFull()
+                ->columnSpanFull()
                 ->collapsed()
                 ->schema([
                     Textarea::make('primer_comentario')
@@ -156,7 +156,6 @@ class PedidoForm
                                 ->width('100px'),
                             TableColumn::make('Precio Unitario')
                                 ->markAsRequired()
-
                                 ->width('100px'),
                             TableColumn::make('Subtotal')
                                 ->markAsRequired()
@@ -192,7 +191,7 @@ class PedidoForm
 
                             TextInput::make('precio_unitario')
                                 ->prefix('$')
-                                ->mask(RawJs::make('$money($input)'))
+                                ->currencyMask(".", ",", 0)
                                 ->numeric()
                                 ->default(0)
                                 ->required()
@@ -205,7 +204,7 @@ class PedidoForm
 
                             TextInput::make('subtotal')
                                 ->prefix('$')
-                                ->mask(RawJs::make('$money($input)'))
+                                ->currencyMask(".", ",", 0)
                                 ->numeric()
                                 ->disabled()
                                 ->dehydrated(true)
@@ -329,7 +328,7 @@ class PedidoForm
 
         $set('subtotal', $subtotalGeneral);
 
-    // 👇 recalcular abonos y total_a_pagar también
+        // 👇 recalcular abonos y total_a_pagar también
         self::recalcularAbonos($set, $get);
     }
 
