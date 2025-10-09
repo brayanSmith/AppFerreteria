@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Pedidos\Pages;
 
 use App\Filament\Resources\Pedidos\PedidoResource;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -14,6 +15,11 @@ class EditPedido extends EditRecord
     {
         return [
             DeleteAction::make(),
+            Action::make('download_pdf')
+                ->label(fn () => 'Descargar PDF (' . ($this->record->contador_impresiones ?? 0) . ')')
+                //->icon('heroicon-o-document-download')
+                ->url(fn () => route('pedidos.pdf.download', $this->record->id))
+                ->openUrlInNewTab(),
         ];
     }
 }

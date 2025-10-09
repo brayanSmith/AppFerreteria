@@ -18,6 +18,9 @@ use Filament\Support\RawJs;
 use App\Models\Producto;
 use DragonCode\Support\Facades\Helpers\Arr;
 use Filament\Forms\Components\Actions\Action;
+use Carbon\Carbon;
+use Filament\Forms\Components\Placeholder;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 
 use function Livewire\Volt\on;
 
@@ -26,6 +29,138 @@ class PedidoForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
+
+            // mostrar días hasta vencimiento solo cuando estado = PENDIENTE
+            Placeholder::make('vencimiento_info')
+                ->content(function ($get) {
+                    $fechaVenc = $get('fecha_vencimiento');
+                    if (empty($fechaVenc)) {
+                        return '';
+                    }
+
+                    try {
+                        $hoy = Carbon::today();
+                        $venc = Carbon::parse($fechaVenc)->startOfDay();
+                        $dias = $hoy->diffInDays($venc, false);
+
+                        if ($dias > 0) {
+                            return "Quedan {$dias} día" . ($dias === 1 ? '' : 's') . " para vencerse";
+                        }
+
+                        if ($dias === 0) {
+                            return 'Vence hoy';
+                        }
+
+                        return "Vencido hace " . abs($dias) . " día" . (abs($dias) === 1 ? '' : 's');
+                    } catch (\Throwable $e) {
+                        return '';
+                    }
+                })
+                ->extraAttributes(function ($get) {
+                    $fechaVenc = $get('fecha_vencimiento');
+                    if (empty($fechaVenc)) {
+                        return ['class' => 'text-sm mb-2'];
+                    }
+
+                    try {
+                        $hoy = Carbon::today();
+                        $venc = Carbon::parse($fechaVenc)->startOfDay();
+                        $dias = $hoy->diffInDays($venc, false);
+
+                        if ($dias > 3) {
+                            $class = 'text-sm bg-green-600 text-white-800 mb-2 p-2 rounded';
+                        } elseif ($dias >= 1) {
+                            $class = 'text-sm bg-yellow-600 text-white-800 mb-2 p-2 rounded';
+                        } elseif ($dias === 0) {
+                            $class = 'text-sm bg-yellow-600 text-white-800 mb-2 p-2 rounded';
+                        } else {
+                            $class = 'text-sm bg-red-600 text-white-800 mb-2 p-2 rounded';
+                        }
+
+                        return ['class' => $class];
+                    } catch (\Throwable $e) {
+                        return ['class' => 'text-sm mb-2'];
+                    }
+                })
+                ->visible(fn($get) => $get('estado') === 'PENDIENTE' && ! empty($get('fecha_vencimiento')))
+                ->columnSpanFull(),
+
+
+            // nuevo: letrero "Próximo abono" (usa la última fecha de abono + 30 días)
+            Placeholder::make('proximo_abono')
+                ->content(function ($get) {
+                    $abonos = $get('abonos') ?? [];
+                    if (empty($abonos)) {
+                        return '';
+                    }
+
+                    try {
+                        $last = collect($abonos)
+                            ->pluck('fecha')
+                            ->filter()
+                            ->map(fn($f) => Carbon::parse($f))
+                            ->sort()
+                            ->last();
+
+                        if (! $last) {
+                            return '';
+                        }
+
+                        $proximo = $last->copy()->addDays(30);
+                        $dias = Carbon::today()->diffInDays($proximo, false);
+                        $label = $proximo->format('d/m/Y');
+
+                        if ($dias > 0) {
+                            return "Próximo abono: {$label} (en {$dias} día" . ($dias === 1 ? '' : 's') . ")";
+                        }
+
+                        if ($dias === 0) {
+                            return "Próximo abono: {$label} (hoy)";
+                        }
+
+                        $vencidos = abs($dias);
+                        return "Próximo abono: {$label} (vencido hace {$vencidos} día" . ($vencidos === 1 ? '' : 's') . ")";
+                    } catch (\Throwable $e) {
+                        return '';
+                    }
+                })
+                ->extraAttributes(function ($get) {
+                    $abonos = $get('abonos') ?? [];
+                    if (empty($abonos)) {
+                        return ['class' => 'text-sm mb-2'];
+                    }
+
+                    try {
+                        $last = collect($abonos)
+                            ->pluck('fecha')
+                            ->filter()
+                            ->map(fn($f) => Carbon::parse($f))
+                            ->sort()
+                            ->last();
+
+                        if (! $last) {
+                            return ['class' => 'text-sm mb-2'];
+                        }
+
+                        $proximo = $last->copy()->addDays(30);
+                        $dias = Carbon::today()->diffInDays($proximo, false);
+
+                        if ($dias > 7) {
+                            return ['class' => 'text-sm bg-green-100 text-green-800 mb-2 p-2 rounded'];
+                        }
+
+                        if ($dias >= 1) {
+                            return ['class' => 'text-sm bg-yellow-100 text-yellow-800 mb-2 p-2 rounded'];
+                        }
+
+                        return ['class' => 'text-sm bg-red-100 text-red-800 mb-2 p-2 rounded'];
+                    } catch (\Throwable $e) {
+                        return ['class' => 'text-sm mb-2'];
+                    }
+                })
+                ->visible(fn($get) => ! empty($get('abonos')) && ((float) ($get('total_a_pagar') ?? 0) > 0))
+                ->columnSpanFull(),
+
 
             // 🔹 Datos generales del pedido
             Section::make('Datos del pedido')
@@ -322,7 +457,6 @@ class PedidoForm
                 ->afterStateUpdated(function ($set, $get) {
                     self::recalcularAbonos($set, $get);
                 }),
-
         ]);
     }
 
@@ -355,8 +489,6 @@ class PedidoForm
         // 👇 recalcular abonos y total_a_pagar también
         self::recalcularAbonos($set, $get);
     }
-
-
     /**
      * 🔹 Recalcular una fila (producto, cantidad o precio).
      */
@@ -390,44 +522,42 @@ class PedidoForm
      *
      * Lógica: total_a_pagar = subtotal - descuento - abonos
      */
-   private static function recalcularAbonos(callable $set, callable $get): void
-{
-    // buscar el scope correcto donde estén los campos (root, padre, abuelo...)
-    $paths = ['', '../../', '../../../'];
-    $basePath = null;
-    foreach ($paths as $p) {
-        $maybe = $get($p . 'abonos');
-        if (!is_null($maybe)) {
-            $basePath = $p;
-            break;
+    private static function recalcularAbonos(callable $set, callable $get): void
+    {
+        // buscar el scope correcto donde estén los campos (root, padre, abuelo...)
+        $paths = ['', '../../', '../../../'];
+        $basePath = null;
+        foreach ($paths as $p) {
+            $maybe = $get($p . 'abonos');
+            if (!is_null($maybe)) {
+                $basePath = $p;
+                break;
+            }
+        }
+        if ($basePath === null) {
+            $basePath = '';
+        }
+
+        $abonos = $get($basePath . 'abonos') ?? [];
+        $totalAbonos = collect($abonos)->sum(fn($abono) => (float) ($abono['monto'] ?? 0));
+
+        // actualizar 'abono' solo si cambia
+        $currentAbono = (float) ($get($basePath . 'abono') ?? 0);
+        if (round($currentAbono, 4) !== round($totalAbonos, 4)) {
+            $set($basePath . 'abono', $totalAbonos);
+        }
+
+        // leer subtotal y descuento desde el mismo scope
+        $subtotal = (float) ($get($basePath . 'subtotal') ?? 0);
+        $descuento = (float) ($get($basePath . 'descuento') ?? 0);
+
+        // total_a_pagar = Subtotal - Abonos - Descuento
+        $totalAPagar = $subtotal - $totalAbonos - $descuento;
+        $totalAPagar = $totalAPagar < 0 ? 0 : $totalAPagar;
+
+        $currentTotal = (float) ($get($basePath . 'total_a_pagar') ?? 0);
+        if (round($currentTotal, 4) !== round($totalAPagar, 4)) {
+            $set($basePath . 'total_a_pagar', $totalAPagar);
         }
     }
-    if ($basePath === null) {
-        $basePath = '';
-    }
-
-    $abonos = $get($basePath . 'abonos') ?? [];
-    $totalAbonos = collect($abonos)->sum(fn($abono) => (float) ($abono['monto'] ?? 0));
-
-    // actualizar 'abono' solo si cambia
-    $currentAbono = (float) ($get($basePath . 'abono') ?? 0);
-    if (round($currentAbono, 4) !== round($totalAbonos, 4)) {
-        $set($basePath . 'abono', $totalAbonos);
-    }
-
-    // leer subtotal y descuento desde el mismo scope
-    $subtotal = (float) ($get($basePath . 'subtotal') ?? 0);
-    $descuento = (float) ($get($basePath . 'descuento') ?? 0);
-
-    // total_a_pagar = Subtotal - Abonos - Descuento
-    $totalAPagar = $subtotal - $totalAbonos - $descuento;
-    $totalAPagar = $totalAPagar < 0 ? 0 : $totalAPagar;
-
-    $currentTotal = (float) ($get($basePath . 'total_a_pagar') ?? 0);
-    if (round($currentTotal, 4) !== round($totalAPagar, 4)) {
-        $set($basePath . 'total_a_pagar', $totalAPagar);
-    }
-}
-
-
 }

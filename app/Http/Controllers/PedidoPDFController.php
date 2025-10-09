@@ -11,11 +11,8 @@ class PedidoPDFController extends Controller
     {
         $pedido = Pedido::with(['cliente', 'detalles.producto'])->findOrFail($id);
 
-        // Marcar que se imprimió/descargó al menos una vez (evita listar dos veces)
-        if (empty($pedido->contador_impresiones) || $pedido->contador_impresiones < 1) {
-            $pedido->contador_impresiones = 1;
-            $pedido->saveQuietly();
-        }
+        // incrementar contador de impresiones de forma atómica
+        $pedido->increment('contador_impresiones');
 
         $pdf = Pdf::loadView('pdf.pedido', [
             'pedido'   => $pedido,
@@ -23,7 +20,6 @@ class PedidoPDFController extends Controller
             'detalles' => $pedido->detalles,
         ]);
 
-        // Forzar descarga
         return $pdf->download("pedido_{$pedido->id}.pdf");
     }
 
@@ -31,11 +27,8 @@ class PedidoPDFController extends Controller
     {
         $pedido = Pedido::with(['cliente', 'detalles.producto'])->findOrFail($id);
 
-        // Marcar impresión/descarga si aún no está marcada
-        if (empty($pedido->contador_impresiones) || $pedido->contador_impresiones < 1) {
-            $pedido->contador_impresiones = 1;
-            $pedido->saveQuietly();
-        }
+        // incrementar contador de impresiones de forma atómica
+        $pedido->increment('contador_impresiones');
 
         $pdf = Pdf::loadView('pdf.pedido', [
             'pedido'   => $pedido,
@@ -43,7 +36,6 @@ class PedidoPDFController extends Controller
             'detalles' => $pedido->detalles,
         ]);
 
-        // Abrir en navegador
         return $pdf->stream("pedido_{$pedido->id}.pdf");
     }
 }
