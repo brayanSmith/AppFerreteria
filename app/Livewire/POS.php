@@ -36,9 +36,9 @@ class POS extends Component
     public $cliente_id = null;
 
     public $valor_decuento = 0; //
-    public $metodo_pago = "A CREDITO";
+    public $metodo_pago = "CREDITO";
     public $tipo_precio = "DETAL";
-    public $tipo_venta = "ELECTRICA";
+    public $tipo_venta = "ELECTRONICA";
 
     public $valor_producto = 0;
 
@@ -57,6 +57,7 @@ class POS extends Component
     {
         //cargar todos los productos
         $this->clientes = Cliente::all();
+
     }
 
     // Resetear la página cuando cambia el buscador o el tamaño de página
@@ -229,9 +230,9 @@ class POS extends Component
             //resetear otras propiedades
             $this->search = '';
             $this->cliente_id = null;
-            $this->metodo_pago = "A CREDITO";
+            $this->metodo_pago = "CREDITO";
             $this->tipo_precio = "DETAL";
-            $this->tipo_venta = "ELECTRICA";
+            $this->tipo_venta = "ELECTRONICA";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
             $this->ciudad = '';
@@ -277,6 +278,8 @@ class POS extends Component
                 return $producto['valor_detal_producto'];
         }
     }
+
+
 
     public function render()
     {

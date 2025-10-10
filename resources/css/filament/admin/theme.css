@@ -3,5 +3,6 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../resources/views/livewire/p-o-s.blade.php';
+@source '../../../../resources/views/livewire/partials/searchable-client-select.blade.php';
 
 

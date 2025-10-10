@@ -14,8 +14,7 @@ return new class extends Migration
     {
         Schema::create('abonos', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha')->default(DB::raw('CURRENT_DATE'));
-            $table->date('fecha_vencimiento')->nullable();
+            $table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->decimal('monto', 12, 2)->default(0);
             $table->string('forma_pago');
             $table->string('descripcion')->nullable();

@@ -68,13 +68,13 @@ class PedidoForm
                         $dias = $hoy->diffInDays($venc, false);
 
                         if ($dias > 3) {
-                            $class = 'text-sm bg-green-600 text-white-800 mb-2 p-2 rounded';
+                            $class = 'text-sm bg-green-600 text-green-50 mb-2 p-2 rounded';
                         } elseif ($dias >= 1) {
-                            $class = 'text-sm bg-yellow-600 text-white-800 mb-2 p-2 rounded';
+                            $class = 'text-sm bg-yellow-600 text-yellow-50 mb-2 p-2 rounded';
                         } elseif ($dias === 0) {
-                            $class = 'text-sm bg-yellow-600 text-white-800 mb-2 p-2 rounded';
+                            $class = 'text-sm bg-yellow-600 text-yellow-50 mb-2 p-2 rounded';
                         } else {
-                            $class = 'text-sm bg-red-600 text-white-800 mb-2 p-2 rounded';
+                            $class = 'text-sm bg-red-600 text-red-50 mb-2 p-2 rounded';
                         }
 
                         return ['class' => $class];
@@ -107,7 +107,7 @@ class PedidoForm
                         }
 
                         $proximo = $last->copy()->addDays(30);
-                        $dias = Carbon::today()->diffInDays($proximo, false);
+                        $dias = (int) Carbon::today()->diffInDays($proximo, false); // <-- entero
                         $label = $proximo->format('d/m/Y');
 
                         if ($dias > 0) {
@@ -143,17 +143,17 @@ class PedidoForm
                         }
 
                         $proximo = $last->copy()->addDays(30);
-                        $dias = Carbon::today()->diffInDays($proximo, false);
+                        $dias = (int) Carbon::today()->diffInDays($proximo, false); // <-- entero
 
                         if ($dias > 7) {
-                            return ['class' => 'text-sm bg-green-100 text-green-800 mb-2 p-2 rounded'];
+                            return ['class' => 'text-sm bg-green-600 text-green-50 mb-2 p-2 rounded'];
                         }
 
                         if ($dias >= 1) {
-                            return ['class' => 'text-sm bg-yellow-100 text-yellow-800 mb-2 p-2 rounded'];
+                            return ['class' => 'text-sm bg-yellow-600 text-yellow-50 mb-2 p-2 rounded'];
                         }
 
-                        return ['class' => 'text-sm bg-red-100 text-red-800 mb-2 p-2 rounded'];
+                        return ['class' => 'text-sm bg-red-600 text-red-50 mb-2 p-2 rounded'];
                     } catch (\Throwable $e) {
                         return ['class' => 'text-sm mb-2'];
                     }

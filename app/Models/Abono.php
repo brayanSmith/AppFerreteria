@@ -15,14 +15,12 @@ class Abono extends Model
         'descripcion',
         'imagen',
         'pedido_id',
-        'fecha_vencimiento',
         'forma_pago',
         'user_id',
     ];
 
     protected $casts = [
         'fecha' => 'date',
-        'fecha_vencimiento' => 'date',
         'monto' => 'decimal:2',
     ];
 
