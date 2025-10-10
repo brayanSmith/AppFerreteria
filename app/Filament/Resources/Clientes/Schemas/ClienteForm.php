@@ -38,6 +38,12 @@ class ClienteForm
                 TextInput::make('representante_legal')
                     ->required(),
                 Toggle::make('activo')
+                    ->required()
+                    ->default(true),
+                Select::make('ruta_id')
+                    ->relationship('ruta', 'ruta')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Select::make('novedad')
                     ->options([
