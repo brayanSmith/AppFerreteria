@@ -80,7 +80,20 @@
                                 Cliente
                             </label>
 
-                            {{-- @include('livewire.partials.searchable-client-select', [
+                             @include('livewire.partials.searchable-client-select', [
+                                'cliente_id' => $cliente_id,
+                                'ciudad' => $ciudad,
+                                'clientes' => $clientes,
+                            ])
+
+
+                            {{-- @include('livewire.partials.selected-search', [
+                                'cliente_id' => $cliente_id,
+                                'ciudad' => $ciudad,
+                                'clientes' => $clientes,
+                            ]) --}}
+
+                            {{-- - @include('livewire.partials.searchable-client-select', [
                                 'clientes' => $clientes,
                                 'model' => 'cliente_id',
                                 'placeholder' => 'Seleccione un cliente',
@@ -94,23 +107,17 @@
                                     @endforeach
                                 </x-filament::input.select>
                             </x-filament::input.wrapper> --}}
-                            {{--<x-filament::select wire:model="cliente_id" placeholder="Seleccione un cliente" searchable
-                                :options="$clientes->pluck('razon_social', 'id')" />--}}
+                            {{-- <x-filament::select wire:model="cliente_id" placeholder="Seleccione un cliente" searchable
+                                :options="$clientes->pluck('razon_social', 'id')" /> --}}
 
-                                <x-filament::input.wrapper>
-    <x-filament::input.select id="cliente" wire:model="cliente_id">
-        <option value="">Seleccione un cliente</option>
-        @foreach ($clientes as $cliente)
-            <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
-        @endforeach
-    </x-filament::input.select>
-</x-filament::input.wrapper>
-
-<script>
-    document.addEventListener('livewire:navigated', () => {
-        new TomSelect('#cliente', { create: false, sortField: { field: "text" } });
-    });
-</script>
+                            {{-- -<x-filament::input.wrapper>
+                                <x-filament::input.select id="cliente" wire:model="cliente_id">
+                                    <option value="">Seleccione un cliente</option>
+                                    @foreach ($clientes as $cliente)
+                                        <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
+                                    @endforeach
+                                </x-filament::input.select>
+                            </x-filament::input.wrapper> --}}
 
 
                             {{-- <select wire:model="cliente_id" id="cliente"
@@ -126,7 +133,7 @@
                             </select> --}}
                         </div>
 
-                        {{-- Ciudad --}}
+                        {{-- Ciudad
                         <div class="space-y-2">
                             <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Ciudad
@@ -137,7 +144,7 @@
                            dark:bg-neutral-900 dark:border-neutral-700
                            dark:text-neutral-400 dark:placeholder-neutral-500
                            dark:focus:ring-neutral-600">
-                        </div>
+                        </div> --}}
 
                         {{-- ...Metodo de Pago... --}}
                         <div class="mt-4">
@@ -258,8 +265,8 @@
     </div>
 
     <!-- Modal de confirmación de venta (Alpine/Filament) -->
-    <div x-data="{ show: @entangle('showConfirmModal') }" x-show="show" x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center" style="display: none;">
+    <div x-data="{ show: @entangle('showConfirmModal') }" x-show="show" x-transition class="fixed inset-0 z-50 flex items-center justify-center"
+        style="display: none;">
         <div class="absolute inset-0 bg-black opacity-40"></div>
         <div
             class="relative bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-8 z-50 flex flex-col items-center">

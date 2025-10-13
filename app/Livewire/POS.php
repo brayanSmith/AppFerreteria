@@ -28,7 +28,7 @@ class POS extends Component
 
     //Propiedades
     public $productos;
-    public $clientes;
+    public $clientes = [];
     public $search = '';
     public $cart = [];
 
@@ -41,8 +41,6 @@ class POS extends Component
     public $tipo_venta = "ELECTRONICA";
 
     public $valor_producto = 0;
-
-
     // Comentarios
     public $primer_comentario = '';
     public $segundo_comentario = '';
@@ -52,13 +50,63 @@ class POS extends Component
 
     public $perPage = 10;
     public $contador_impresiones = 0;
+    public $ciudades = [];
+    public $ciudadSeleccionada;
+
 
     public function mount()
     {
-        //cargar todos los productos
-        $this->clientes = Cliente::all();
 
+        $this->clientes = Cliente::orderBy('razon_social')->get();
+        $this->ciudades = Cliente::select('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad')->toArray();
     }
+
+    // Actualizar ciudad cuando se selecciona un cliente
+    public function updatedClienteId($value): void
+{
+    // 1) Reset dependientes
+    $this->ciudadSeleccionada = '';
+    if (property_exists($this, 'ciudad')) {
+        $this->ciudad = '';
+    }
+
+    // 2) Normaliza ID (evita '0', '', 'abc', etc.)
+    $id = filter_var($value, FILTER_VALIDATE_INT) ?: null;
+    if (!$id) {
+        return; // selección vacía o inválida
+    }
+
+    // 3) Si ya tienes la colección $clientes, úsala y evita ir a BD
+    if (property_exists($this, 'clientes') && !empty($this->clientes)) {
+        $c = collect($this->clientes)->firstWhere('id', $id);
+        if ($c) {
+            $this->ciudadSeleccionada = $c['ciudad'] ?? $c['municipio'] ?? '';
+            if (property_exists($this, 'ciudad')) {
+                $this->ciudad = $this->ciudadSeleccionada;
+            }
+            return;
+        }
+    }
+
+    // 4) Fallback: obtener sólo lo necesario de BD
+    $cliente = Cliente::query()
+        ->select(['id', 'ciudad', 'municipio'])
+        ->find($id);
+
+    if (!$cliente) {
+        // Si usas Tom Select / Select2 puedes limpiar el widget en el front:
+        // $this->dispatch('reset-cliente-select'); // JS hará ts.clear() / $el.val(null).trigger('change')
+        return;
+    }
+
+    // 5) Asignar ciudad
+    $this->ciudadSeleccionada = $cliente->ciudad ?: $cliente->municipio ?: '';
+    if (property_exists($this, 'ciudad')) {
+        $this->ciudad = $this->ciudadSeleccionada;
+    }
+}
+
+
 
     // Resetear la página cuando cambia el buscador o el tamaño de página
     public function updated($name, $value)
@@ -194,7 +242,8 @@ class POS extends Component
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
                 'subtotal' => $this->subtotal(),
-                'ciudad' => $this->ciudad,
+                //'ciudad' => $this->ciudad,
+                'ciudad' => $this->ciudadSeleccionada,
 
 
             ]);
@@ -235,7 +284,7 @@ class POS extends Component
             $this->tipo_venta = "ELECTRONICA";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
-            $this->ciudad = '';
+            $this->ciudadSeleccionada = '';
 
             // Guardar la URL del PDF en la sesión para mostrar el botón en la modal
             session(['pedido_pdf_url' => route('pedidos.pdf.download', $pedido->id)]);
@@ -246,13 +295,6 @@ class POS extends Component
             // 🚀 Cerrar la modal del carrito
             $this->dispatch('cerrar-modal-carrito');
 
-            // 🚀 Descargar automáticamente el PDF
-            //return redirect()->route('pedidos.pdf.download', $pedido->id);
-
-            // 🚀 Llamar al evento JS con la URL del PDF
-            /*$this->dispatchBrowserEvent('descargar-pdf', [
-                'url' => route('pedidos.pdf.download', $pedido->id),
-            ]);*/
 
             // Limpiar la URL de PDF de la sesión después de mostrar la modal
         } catch (Exception $th) {
@@ -278,8 +320,6 @@ class POS extends Component
                 return $producto['valor_detal_producto'];
         }
     }
-
-
 
     public function render()
     {
