@@ -30,13 +30,16 @@ class PedidosTable
             ])->defaultGroup('fecha')
             ->columns([
                 TextColumn::make('fecha')
+                    ->label('Fecha de Facturación')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('codigo')
+                    ->label('Código')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('cliente.razon_social')
-                    ->numeric()
+                    ->label('Cliente')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('cliente.ruta.ruta')
                     ->label('Ruta')
@@ -46,8 +49,8 @@ class PedidosTable
                     ->numeric()
                     ->sortable(),
 
-                ToggleColumn::make('levantar_deuda')
-                    ->label('Levantar Deuda'),
+                ToggleColumn::make('impresa')
+                    ->label('Impresa'),
 
                 TextColumn::make('ciudad')
                     ->searchable(),

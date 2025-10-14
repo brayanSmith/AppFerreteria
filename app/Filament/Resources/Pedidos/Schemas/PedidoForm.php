@@ -21,6 +21,7 @@ use Filament\Forms\Components\Actions\Action;
 use Carbon\Carbon;
 use Filament\Forms\Components\Placeholder;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Hamcrest\Core\IsEqual;
 
 use function Livewire\Volt\on;
 
@@ -225,7 +226,21 @@ class PedidoForm
                             fn($state, $set, $get) =>
                             self::recalcularTodo($set, $get, $state)
                         )
-                        ->columnSpan(1),
+                        ->columnSpan(2),
+
+                    ToggleButtons::make('estado_pago')
+                        ->options([
+                            'EN_CARTERA' => 'En Cartera',
+                            'SALDADO'    => 'Saldado',
+                        ])
+                        ->default('EN_CARTERA')
+                        ->grouped()
+                        ->required()
+                        ->reactive()
+                        ->afterStateUpdated(
+                            fn($state, $set, $get) =>
+                            self::recalcularTodo($set, $get, $state)
+                        )
                 ]),
 
             // 🔹 Totales
@@ -375,6 +390,7 @@ class PedidoForm
 
             Section::make('Abonos')
                 ->columnSpanFull()
+                ->visible(fn($get) => $get('estado') === 'FACTURADO')
                 ->schema([
                     Repeater::make('abonos')
                         ->relationship('abonoPedido')

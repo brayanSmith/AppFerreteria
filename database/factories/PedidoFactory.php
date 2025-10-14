@@ -40,6 +40,8 @@ class PedidoFactory extends Factory
                 'descuento' => 0,
                 'abono' => 0,
                 'total_a_pagar' => 0,
+            'impresa' => $this->faker->boolean(70), // 70% de probabilidad de ser true
+            'estado_pago' => $this->faker->randomElement(['EN_CARTERA', 'SALDADO'])
 
         ];
     }

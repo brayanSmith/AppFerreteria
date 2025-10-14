@@ -19,11 +19,12 @@ return new class extends Migration
             $table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->date('fecha_vencimiento')->nullable();
             $table->string('ciudad')->nullable();
-            $table->enum('estado', ['PENDIENTE', 'FACTURADO', 'ANULADO'])->default('PENDIENTE');
+            $table->enum('estado', ['PENDIENTE', 'FACTURADO', 'ANULADO'])->default(value: 'PENDIENTE');
             $table->boolean('en_cartera')->default(false);
             $table->enum('metodo_pago', ['CREDITO', 'CONTADO'])->default('CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
             $table->enum('tipo_venta', ['ELECTRONICA','REMISIONADA'])->default('ELECTRONICA');
+            $table->enum('estado_pago', ['EN_CARTERA', 'SALDADO'])->default('EN_CARTERA');
             $table->text('primer_comentario')->nullable();
             $table->text('segundo_comentario')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);
@@ -31,6 +32,7 @@ return new class extends Migration
             $table->decimal('descuento', 12, 2)->default(0)->nullable();
             $table->decimal('total_a_pagar', 12, 2)->default(0);
             $table->integer('contador_impresiones')->default(0);
+            $table->boolean('impresa')->default(false);
             $table->timestamps();
         });
     }

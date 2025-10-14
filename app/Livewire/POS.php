@@ -45,14 +45,13 @@ class POS extends Component
     public $primer_comentario = '';
     public $segundo_comentario = '';
     public $ciudad = '';
-
+    public $direccion = '';
     public $cantidad = 1;
-
     public $perPage = 10;
     public $contador_impresiones = 0;
     public $ciudades = [];
     public $ciudadSeleccionada;
-
+    public $direccionSeleccionada;
 
     public function mount()
     {
@@ -66,8 +65,12 @@ class POS extends Component
 {
     // 1) Reset dependientes
     $this->ciudadSeleccionada = '';
+    $this->direccionSeleccionada = '';
     if (property_exists($this, 'ciudad')) {
         $this->ciudad = '';
+    }
+    if (property_exists($this, 'direccion')) {
+        $this->direccion = '';
     }
 
     // 2) Normaliza ID (evita '0', '', 'abc', etc.)
@@ -81,8 +84,12 @@ class POS extends Component
         $c = collect($this->clientes)->firstWhere('id', $id);
         if ($c) {
             $this->ciudadSeleccionada = $c['ciudad'] ?? $c['municipio'] ?? '';
+            $this->direccionSeleccionada = $c['direccion'] ?? $c['direccion'] ?? '';
             if (property_exists($this, 'ciudad')) {
                 $this->ciudad = $this->ciudadSeleccionada;
+            }
+            if (property_exists($this, 'direccion')) {
+                $this->direccion = $this->direccionSeleccionada;
             }
             return;
         }
@@ -90,7 +97,7 @@ class POS extends Component
 
     // 4) Fallback: obtener sólo lo necesario de BD
     $cliente = Cliente::query()
-        ->select(['id', 'ciudad', 'municipio'])
+        ->select(['id', 'ciudad', 'municipio' ,'direccion'])
         ->find($id);
 
     if (!$cliente) {
@@ -100,11 +107,15 @@ class POS extends Component
     }
 
     // 5) Asignar ciudad
-    $this->ciudadSeleccionada = $cliente->ciudad ?: $cliente->municipio ?: '';
-    if (property_exists($this, 'ciudad')) {
-        $this->ciudad = $this->ciudadSeleccionada;
+     $this->ciudadSeleccionada = $cliente->ciudad ?: $cliente->municipio ?: '';
+       $this->direccionSeleccionada = $cliente->direccion ?? $cliente->direccion1 ?? $cliente->direccion_1 ?? '';
+        if (property_exists($this, 'ciudad')) {
+            $this->ciudad = $this->ciudadSeleccionada;
+        }
+        if (property_exists($this, 'direccion')) {
+            $this->direccion = $this->direccionSeleccionada;
+        }
     }
-}
 
 
 
@@ -244,7 +255,8 @@ class POS extends Component
                 'subtotal' => $this->subtotal(),
                 //'ciudad' => $this->ciudad,
                 'ciudad' => $this->ciudadSeleccionada,
-
+                //vamoa haacer que la fecha de vencimiento sea 30 dias despues de la fecha actual
+                'fecha_vencimiento' => now()->addDays(30)->toDateString(),
 
             ]);
 

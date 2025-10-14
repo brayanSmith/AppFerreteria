@@ -29,6 +29,8 @@ class Pedido extends Model
         'descuento',
         'total_a_pagar',
         'contador_impresiones',
+        'impresa',
+        'estado_pago',
     ];
 
     protected $casts = [
