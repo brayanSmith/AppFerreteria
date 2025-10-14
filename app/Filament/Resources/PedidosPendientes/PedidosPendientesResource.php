@@ -23,6 +23,8 @@ class PedidosPendientesResource extends Resource
 
 
     protected static string|UnitEnum|null $navigationGroup = 'Ventas';
+    protected static ?string $navigationParentItem = 'Pedidos';
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'codigo';
 

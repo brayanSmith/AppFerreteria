@@ -12,8 +12,10 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Table;
 use UnitEnum;
+
 
 class PedidosFacturadosResource extends Resource
 {
@@ -21,6 +23,8 @@ class PedidosFacturadosResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|UnitEnum|null $navigationGroup = 'Ventas';
+    protected static ?string $navigationParentItem = 'Pedidos';
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'codigo';
 
@@ -53,7 +57,7 @@ class PedidosFacturadosResource extends Resource
     {
         return [
             'index' => ListPedidosFacturados::route('/'),
-            'create' => CreatePedidosFacturados::route('/create'),
+            //'create' => CreatePedidosFacturados::route('/create'),
             'edit' => EditPedidosFacturados::route('/{record}/edit'),
         ];
     }

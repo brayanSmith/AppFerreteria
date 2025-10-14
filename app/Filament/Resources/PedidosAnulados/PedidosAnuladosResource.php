@@ -21,6 +21,8 @@ class PedidosAnuladosResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|UnitEnum|null $navigationGroup = 'Ventas';
+    protected static ?string $navigationParentItem = 'Pedidos';
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'codigo';
 
@@ -53,7 +55,7 @@ class PedidosAnuladosResource extends Resource
     {
         return [
             'index' => ListPedidosAnulados::route('/'),
-            'create' => CreatePedidosAnulados::route('/create'),
+            //'create' => CreatePedidosAnulados::route('/create'),
             'edit' => EditPedidosAnulados::route('/{record}/edit'),
         ];
     }

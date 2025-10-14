@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PedidosEstadoPagoEnCarteras;
 
+
 use App\Filament\Resources\PedidosEstadoPagoEnCarteras\Pages\CreatePedidosEstadoPagoEnCartera;
 use App\Filament\Resources\PedidosEstadoPagoEnCarteras\Pages\EditPedidosEstadoPagoEnCartera;
 use App\Filament\Resources\PedidosEstadoPagoEnCarteras\Pages\ListPedidosEstadoPagoEnCarteras;
@@ -21,6 +22,9 @@ class PedidosEstadoPagoEnCarteraResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
     protected static string|UnitEnum|null $navigationGroup = 'Ventas';
+    //protected static ?string $navigationParentItem = 'Pedidos';
+    //protected static ?int $navigationSort = 1;
+
 
     protected static ?string $recordTitleAttribute = 'codigo';
 
