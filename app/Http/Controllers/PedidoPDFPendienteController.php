@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class PedidoPDFController extends Controller
+class PedidoPDFPendienteController extends Controller
 {
     public function download($id)
     {

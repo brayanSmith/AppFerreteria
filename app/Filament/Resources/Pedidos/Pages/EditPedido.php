@@ -20,6 +20,12 @@ class EditPedido extends EditRecord
                 //->icon('heroicon-o-document-download')
                 ->url(fn () => route('pedidos.pdf.download', $this->record->id))
                 ->openUrlInNewTab(),
+
+            Action::make('download_pdf_facturado')
+                ->label(fn () => 'Descargar PDF Facturado')
+                //->icon('heroicon-o-document-download')
+                ->url(fn () => route('pedidosFacturados.pdf.download', $this->record->id))
+                ->openUrlInNewTab(),
         ];
     }
 }

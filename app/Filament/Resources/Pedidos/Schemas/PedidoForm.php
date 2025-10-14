@@ -86,7 +86,6 @@ class PedidoForm
                 ->visible(fn($get) => $get('estado') === 'PENDIENTE' && ! empty($get('fecha_vencimiento')))
                 ->columnSpanFull(),
 
-
             // nuevo: letrero "Próximo abono" (usa la última fecha de abono + 30 días)
             Placeholder::make('proximo_abono')
                 ->content(function ($get) {
@@ -161,7 +160,6 @@ class PedidoForm
                 })
                 ->visible(fn($get) => ! empty($get('abonos')) && ((float) ($get('total_a_pagar') ?? 0) > 0))
                 ->columnSpanFull(),
-
 
             // 🔹 Datos generales del pedido
             Section::make('Datos del pedido')

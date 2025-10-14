@@ -117,8 +117,6 @@ class POS extends Component
         }
     }
 
-
-
     // Resetear la página cuando cambia el buscador o el tamaño de página
     public function updated($name, $value)
     {
@@ -126,8 +124,6 @@ class POS extends Component
             $this->resetPage();
         }
     }
-
-
 
     #[Computed]
     public function filteredProducts()
@@ -274,7 +270,6 @@ class POS extends Component
 
                 ]);
 
-
                 //actualizar ek stock
                 $inventario = Producto::find($producto['id']);
                 if ($inventario) {
@@ -284,10 +279,8 @@ class POS extends Component
             }
             DB::commit();
 
-
             //reset cart
             $this->cart = [];
-
             //resetear otras propiedades
             $this->search = '';
             $this->cliente_id = null;
@@ -306,7 +299,6 @@ class POS extends Component
 
             // 🚀 Cerrar la modal del carrito
             $this->dispatch('cerrar-modal-carrito');
-
 
             // Limpiar la URL de PDF de la sesión después de mostrar la modal
         } catch (Exception $th) {
