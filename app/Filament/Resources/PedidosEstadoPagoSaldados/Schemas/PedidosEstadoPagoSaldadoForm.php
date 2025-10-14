@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Pedidos\Schemas;
-
-use Filament\Schemas\Schema;
+namespace App\Filament\Resources\PedidosEstadoPagoSaldados\Schemas;
 use App\Filament\Resources\Pedidos\Schemas\Concerns\HasPedidoSections;
 
-class PedidoForm
+use Filament\Schemas\Schema;
+
+class PedidosEstadoPagoSaldadoForm
 {
     use HasPedidoSections;
 

@@ -1,31 +1,30 @@
 <?php
 
-namespace App\Filament\Resources\Pedidos\Tables;
+namespace App\Filament\Resources\PedidosEstadoPagoEnCarteras\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Grouping\Group;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 
-class PedidosTable
+class PedidosEstadoPagoEnCarterasTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            //voy a traer los pedidos que esten en estado_pago EN_CARTERA y estado FACTURADO
+            ->modifyQueryUsing(fn ($query) => $query->where('estado_pago', 'EN_CARTERA')->where('estado', 'FACTURADO'))
             ->groups([
                 Group::make('fecha')
                     ->date()
                     ->collapsible(),
                 Group::make('cliente.ruta.ruta')
                     ->collapsible(),
-
 
             ])->defaultGroup('fecha')
             ->columns([
@@ -120,3 +119,4 @@ class PedidosTable
             ]);
     }
 }
+

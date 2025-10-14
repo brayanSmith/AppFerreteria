@@ -46,7 +46,7 @@ class PedidoResource extends Resource
     {
         return [
             'index' => ListPedidos::route('/'),
-            'create' => CreatePedido::route('/create'),
+            //'create' => CreatePedido::route('/create'),
             'edit' => EditPedido::route('/{record}/edit'),
         ];
     }

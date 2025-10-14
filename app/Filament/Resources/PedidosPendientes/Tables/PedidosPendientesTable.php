@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Filament\Resources\Pedidos\Tables;
+namespace App\Filament\Resources\PedidosPendientes\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 
-class PedidosTable
+class PedidosPendientesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->where('estado', 'PENDIENTE'))
             ->groups([
                 Group::make('fecha')
                     ->date()
                     ->collapsible(),
                 Group::make('cliente.ruta.ruta')
                     ->collapsible(),
-
 
             ])->defaultGroup('fecha')
             ->columns([

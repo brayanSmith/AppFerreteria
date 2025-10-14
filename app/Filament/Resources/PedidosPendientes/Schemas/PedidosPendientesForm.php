@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\Pedidos\Schemas;
+namespace App\Filament\Resources\PedidosPendientes\Schemas;
 
-use Filament\Schemas\Schema;
 use App\Filament\Resources\Pedidos\Schemas\Concerns\HasPedidoSections;
+use Filament\Schemas\Schema;
+//use App\Filament\Resources\Pedidos\Schemas\Concerns\HasPedidoSections;
 
-class PedidoForm
+class PedidosPendientesForm
 {
     use HasPedidoSections;
 
@@ -23,3 +24,6 @@ class PedidoForm
         return $schema->components($components);
     }
 }
+
+
+

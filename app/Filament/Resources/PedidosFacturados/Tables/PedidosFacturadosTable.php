@@ -1,24 +1,25 @@
 <?php
 
-namespace App\Filament\Resources\Pedidos\Tables;
+namespace App\Filament\Resources\PedidosFacturados\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 
-class PedidosTable
+class PedidosFacturadosTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->where('estado', 'FACTURADO'))
             ->groups([
                 Group::make('fecha')
                     ->date()
@@ -26,9 +27,9 @@ class PedidosTable
                 Group::make('cliente.ruta.ruta')
                     ->collapsible(),
 
-
             ])->defaultGroup('fecha')
             ->columns([
+                //
                 TextColumn::make('fecha')
                     ->label('Fecha de Facturación')
                     ->dateTime()
@@ -92,7 +93,7 @@ class PedidosTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Filtro por Ruta
+                //
                 SelectFilter::make('cliente.ruta_id')
                     ->label('Ruta')
                     ->relationship('cliente.ruta', 'ruta')
@@ -107,8 +108,6 @@ class PedidosTable
                     ->searchable()
                     ->preload()
                     ->multiple(),
-
-
             ])
             ->recordActions([
                 EditAction::make(),
