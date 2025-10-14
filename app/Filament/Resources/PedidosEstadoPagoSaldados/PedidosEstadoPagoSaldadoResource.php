@@ -20,7 +20,7 @@ class PedidosEstadoPagoSaldadoResource extends Resource
     protected static ?string $model = Pedido::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string|UnitEnum|null $navigationGroup = 'Ventas';
+    protected static string|UnitEnum|null $navigationGroup = 'Cartera';
 
     protected static ?string $recordTitleAttribute = 'codigo';
 
@@ -42,11 +42,11 @@ class PedidosEstadoPagoSaldadoResource extends Resource
     }
     public static function getNavigationLabel(): string
     {
-        return 'Pedidos Estado Pago Saldados';
+        return 'Pagos Saldados';
     }
     public static function getPluralLabel(): string
     {
-        return 'Pedidos Estado Pago Saldados';
+        return 'Pagos Saldados';
     }
 
     public static function getPages(): array

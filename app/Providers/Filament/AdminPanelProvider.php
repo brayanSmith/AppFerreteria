@@ -18,6 +18,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Support\Assets\Css;
+use Filament\Support\Assets\Js;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -58,6 +60,16 @@ class AdminPanelProvider extends PanelProvider
             ])
 
             ->viteTheme('resources/css/filament/admin/theme.css')
+
+            // 👇 AQUI registras tus CDN
+            ->assets([
+                Css::make('tomselect-css', 'https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css'),
+                Js::make('tomselect-js',  'https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js'),
+            ])
+
+            // 👇 (Opcional) inyecta un blade al final del <body> para tu JS de inicialización
+            //->renderHook('panels::body.end', fn() => view('filament.custom-scripts'))
+
 
             ->authMiddleware([
                 Authenticate::class,
