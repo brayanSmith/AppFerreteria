@@ -176,6 +176,11 @@ trait HasPedidoSections
                         'ANULADO'   => 'Anulado',
                     ])->default('PENDIENTE')->required()->columnSpan(2)->grouped(),
 
+                    ToggleButtons::make('tipo_venta')->options([
+                        'REMISIONADA' => 'Remisionada',
+                        'ELECTRONICA' => 'Electrónica',
+                    ])->required()->columnSpan(2)->grouped(),
+
 
                     // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)
                     /*Placeholder::make('estado_pago_info')

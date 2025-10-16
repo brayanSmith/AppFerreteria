@@ -11,7 +11,7 @@ class PedidoObserver
 {
     //
     public function saved(Pedido $pedido) {
-        $pedido->recalcularTotales(0.0); //ajustar iva si aplica
+        $pedido->recalcularTotales(); //ajustar iva si aplica
         //si se marca como pagado y aun no se desconto stock
         /*if ($pedido->wasChanged('estado') && $pedido->estado === 'pagado'){
             foreach($pedido->detalles as $linea){

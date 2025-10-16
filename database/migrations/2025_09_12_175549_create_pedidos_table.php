@@ -24,8 +24,8 @@ return new class extends Migration
             $table->boolean('stock_retirado')->default(false);
             $table->boolean('en_cartera')->default(false);
             $table->enum('metodo_pago', ['CREDITO', 'CONTADO'])->default('CREDITO');
-            $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');
-            $table->enum('tipo_venta', ['ELECTRONICA','REMISIONADA'])->default('ELECTRONICA');
+            $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('FERRETERO');
+            $table->enum('tipo_venta', ['ELECTRONICA','REMISIONADA'])->default('REMISIONADA');
             $table->enum('estado_pago', ['EN_CARTERA', 'SALDADO'])->default('EN_CARTERA');
             $table->text('primer_comentario')->nullable();
             $table->text('segundo_comentario')->nullable();

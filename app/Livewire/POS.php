@@ -37,8 +37,8 @@ class POS extends Component
 
     public $valor_decuento = 0; //
     public $metodo_pago = "CREDITO";
-    public $tipo_precio = "DETAL";
-    public $tipo_venta = "ELECTRONICA";
+    public $tipo_precio = "FERRETERO";
+    public $tipo_venta = "REMISIONADA";
 
     public $valor_producto = 0;
     // Comentarios
