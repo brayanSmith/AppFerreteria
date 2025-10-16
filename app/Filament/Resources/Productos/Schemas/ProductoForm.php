@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -106,6 +107,62 @@ class ProductoForm
                     ->required()
                     ->numeric()
                     ->default(0),
+
+                TextInput::make('tipo_producto')
+                    ->label('Tipo de Producto')
+                    ->required()
+                    ->maxLength(100)
+                    ->placeholder('Ingrese el tipo de producto'),
+
+                TextInput::make('peso_producto')
+                    ->label('Peso (kg)')
+                    ->required()
+                    ->numeric()
+                    ->default(0),
+                TextInput::make('ubicacion_producto')
+                    ->label('Ubicación')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('Ingrese la ubicación del producto'),
+                TextInput::make('alerta_producto')
+                    ->label('Alerta de Stock')
+                    ->required()
+                    ->numeric()
+                    ->default(0),
+                TextInput::make('empaquetado_externo')
+                    ->label('Empaquetado Externo')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('Ingrese el tipo de empaquetado externo'),
+                TextInput::make('empaquetado_interno')
+                    ->label('Empaquetado Interno')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('Ingrese el tipo de empaquetado interno'),
+                TextInput::make('referencia_producto')
+                    ->label('Referencia')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('Ingrese la referencia del producto'),
+                TextInput::make('codigo_cliente')
+                    ->label('Código Cliente')
+                    ->required()
+                    ->maxLength(255)
+                    ->placeholder('Ingrese el código del cliente'),
+                ToggleButtons::make('volumen_producto')
+                    ->label('Volumen')
+                    ->options([
+                        'EXTRA_GRANDE' => 'Extra Grande',
+                        'GRANDE' => 'Grande',
+                        'MEDIANO' => 'Mediano',
+                        'PEQUEÑO' => 'Pequeño',
+                        'EXTRA_PEQUEÑO' => 'Extra Pequeño',
+                    ])
+                    ->required()
+                    ->default('MEDIANO')
+                    ->grouped(),
+
+
 
                 Toggle::make('activo')
                     ->required()
