@@ -113,4 +113,13 @@ class Pedido extends Model
             $pedido->saveQuietly();
         });
     }
+
+    // Atributo: devolver fecha en America/Bogota
+    public function getFechaAttribute($value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+        return \Carbon\Carbon::parse($value)->setTimezone('America/Bogota');
+    }
 }
