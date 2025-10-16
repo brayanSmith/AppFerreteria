@@ -285,8 +285,8 @@ class POS extends Component
             $this->search = '';
             $this->cliente_id = null;
             $this->metodo_pago = "CREDITO";
-            $this->tipo_precio = "DETAL";
-            $this->tipo_venta = "ELECTRONICA";
+            $this->tipo_precio = "FERRETERO";
+            $this->tipo_venta = "REMISIONADA";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
             $this->ciudadSeleccionada = '';

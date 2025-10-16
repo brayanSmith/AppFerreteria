@@ -17,6 +17,8 @@ use Filament\Forms\Components\Placeholder;
 use Carbon\Carbon;
 use App\Models\Producto;
 use Dom\Text;
+use Filament\Forms\Components\Toggle;
+use App\Models\Cliente;
 
 use function Livewire\Volt\on;
 
@@ -114,7 +116,19 @@ trait HasPedidoSections
                         ->searchable()
                         ->required()
                         ->preload()
+                        ->reactive()
+                        ->afterStateHydrated(fn($state, $set) => $set('retenedor_fuente_flag', $state ? (Cliente::find($state)?->retenedor_fuente === 'SI') : false))
+                        ->afterStateUpdated(function ($state, $set) {
+                            $set('retenedor_fuente_flag', $state ? (Cliente::find($state)?->retenedor_fuente === 'SI') : false);
+                        })
                         ->columnSpan(3),
+
+                    // Toggle informativo (SI / NO). No se persiste en la BD.
+                    Toggle::make('retenedor_fuente_flag')
+                        ->label('Retenedor fuente')
+                        ->disabled()               // solo informativo: el usuario no lo cambia aquí
+                        ->dehydrated(false)        // no guardarlo en la BD
+                        ->columnSpan(1),
 
                     DatePicker::make('fecha')->label('Fecha de Facturación')->required()->columnSpan(2),
                     TextInput::make('dias_plazo_vencimiento')->label('Días Plazo Vencimiento')->default(30)->numeric()->required()->reactive()
@@ -245,7 +259,7 @@ trait HasPedidoSections
                                 ->reactive()
                                 ->afterStateHydrated(function ($state, $set) {
                                     // al hidratar fila (editar existente) rellenar código
-                                    $set('codigo_producto', $state ? optional(\App\Models\Producto::find($state))->codigo_producto : null);
+                                    $set('codigo_producto', $state ? optional(Producto::find($state))->codigo_producto : null);
                                 })
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     // recalcular precios/subtotales
@@ -276,7 +290,13 @@ trait HasPedidoSections
                                 ->default(0)
                                 ->required()
                                 ->live(onBlur: true)
-                                //->readOnly(true)
+                                // ahora editable por el usuario; si el usuario cambia este valor
+                                // recalculamos subtotal sin sobreescribir el precio
+                                ->readOnly(false)
+                                ->afterStateUpdated(function ($state, $set, $get) {
+                                    // recalcula solo con el precio unitario proporcionado por el usuario
+                                    self::recalcularDesdePrecioManual($set, $get);
+                                })
                                 ->columnSpan(1),
 
                             TextInput::make('subtotal')
@@ -287,10 +307,12 @@ trait HasPedidoSections
                                 ->dehydrated(true)
                                 ->columnSpan(1),
                         ])
+                        ->addActionLabel('Añadir Producto')
                         ->deleteAction(fn(\Filament\Actions\Action $action) => $action->after(function ($record, $set, $get) {
                             self::recalcularTodo($set, $get, $get('tipo_precio'));
+
                         })),
-                ]),
+                ]) ,
         ];
     }
 
@@ -410,5 +432,22 @@ trait HasPedidoSections
     {
         $producto = Producto::find($productoId);
         return $producto ? $producto->codigo_producto : '-';
+    }
+
+    private static function recalcularDesdePrecioManual(callable $set, callable $get): void
+    {
+        $cantidad = (float) ($get('cantidad') ?? 0);
+        $precio = (float) ($get('precio_unitario') ?? 0);
+
+        $subtotal = $cantidad * $precio;
+        $set('subtotal', $subtotal);
+
+        // recalcular subtotal general del pedido (busca en el contexto del repeater)
+        $detalles = $get('../../detalles') ?? [];
+        $totalPedido = collect($detalles)->sum(fn($d) => (float) ($d['subtotal'] ?? 0));
+        $set('../../subtotal', $totalPedido);
+
+        // recalcular abonos/total a pagar
+        self::recalcularAbonos($set, $get);
     }
 }
