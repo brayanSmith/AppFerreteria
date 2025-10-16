@@ -19,7 +19,7 @@ class PedidosEstadoPagoSaldadosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->where('estado_pago', 'SALDADO')->where('estado_pago', 'PAGADO'))
+            ->modifyQueryUsing(fn ($query) => $query->where('estado_pago', 'SALDADO')->where('estado', 'FACTURADO'))
             ->groups([
                 Group::make('fecha')
                     ->date()
