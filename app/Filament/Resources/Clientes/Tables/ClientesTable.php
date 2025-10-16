@@ -36,6 +36,22 @@ class ClientesTable
                     ->boolean(),
                 TextColumn::make('novedad')
                     ->searchable(),
+                TextColumn::make('tipo_cliente')
+                    ->searchable(),
+                TextColumn::make('ruta.ruta')
+                    ->label('Ruta')
+                    ->searchable(),
+                IconColumn::make('retenedor_fuente')
+                    ->label('Retenedor Fuente')
+                    ->boolean(),
+                IconColumn::make('rut_imagen')
+                    ->label('RUT')
+                    ->url(fn ($record) => $record->rut_imagen ? asset('storage/' . $record->rut_imagen) : null)
+                    ->openUrlInNewTab()
+                    ->tooltip('Ver RUT')
+                    ->icon('heroicon-o-document')
+                    ->boolean(),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

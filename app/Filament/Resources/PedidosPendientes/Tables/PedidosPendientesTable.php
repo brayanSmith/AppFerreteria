@@ -34,7 +34,7 @@ class PedidosPendientesTable
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('codigo')
-                    ->label('Código')
+                    ->label('Remisión')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('cliente.razon_social')
@@ -45,34 +45,9 @@ class PedidosPendientesTable
                     ->label('Ruta')
                     ->sortable(),
 
-                TextColumn::make('subtotal')
-                    ->numeric(0)
-                    ->sortable(),
-
-                TextColumn::make('abono')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('descuento')
-                    ->numeric(0)
-                    ->sortable(),
-                TextColumn::make('total_a_pagar')
-                    ->label('Total a Pagar')
-                    ->numeric(0)
-                    ->sortable(),
-
                 ToggleColumn::make('impresa')
                     ->label('Impresa'),
 
-                TextColumn::make('ciudad')
-                    ->searchable(),
-                TextColumn::make('estado')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'PENDIENTE' => 'warning',
-                        'FACTURADO' => 'success',
-                        'ANULADO' => 'danger',
-                        default => 'primary',
-                    }),
                 TextColumn::make('metodo_pago')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {

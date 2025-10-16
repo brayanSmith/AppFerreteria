@@ -21,6 +21,10 @@ class Cliente extends Model
         'activo',
         'novedad',
         'ruta_id',
+        'comercial',
+        'tipo_cliente',
+        'rut_imagen',
+        'retenedor_fuente',
     ];
 
     public function pedidos()

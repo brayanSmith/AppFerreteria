@@ -53,6 +53,15 @@ return new class extends Migration
             $table->foreignId('sub_categoria_id')->constrained('sub_categorias')->onDelete('cascade');
             $table->integer('stock')->default(0);
             $table->boolean('activo')->default(true);
+            $table->string('tipo_producto')->nullable();
+            $table->decimal('peso_producto', 8, 2)->nullable();
+            $table->string('ubicacion_producto')->nullable();
+            $table->integer('alerta_producto')->default(0);
+            $table->string('empaquetado_externo')->nullable();
+            $table->string('empaquetado_interno')->nullable();
+            $table->string('referencia_producto')->nullable();
+            $table->string('codigo_cliente')->nullable();
+            $table->enum('volumen_producto', ['EXTRA_GRANDE', 'GRANDE', 'MEDIANO', 'PEQUEÑO', 'EXTRA_PEQUEÑO'])->nullable();
             $table->timestamps();
         });
 

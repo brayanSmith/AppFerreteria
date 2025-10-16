@@ -34,7 +34,7 @@ class PedidosAnuladosTable
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('codigo')
-                    ->label('Código')
+                    ->label('Remisión')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('cliente.razon_social')

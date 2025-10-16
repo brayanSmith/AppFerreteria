@@ -52,6 +52,11 @@ class ProductosTable
                 TextColumn::make('bodega_id')
                     ->numeric()
                     ->sortable(),
+
+                TextColumn::make('stock')
+                    ->numeric()
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

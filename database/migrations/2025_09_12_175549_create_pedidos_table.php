@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('codigo')->unique()->nullable();
             $table->foreignId('cliente_id')->constrained('clientes');
             $table->dateTime('fecha')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->integer('dias_plazo_vencimiento')->default(30);
             $table->date('fecha_vencimiento')->nullable();
             $table->string('ciudad')->nullable();
             $table->enum('estado', ['PENDIENTE', 'FACTURADO', 'ANULADO'])->default(value: 'PENDIENTE');
+            $table->boolean('stock_retirado')->default(false);
             $table->boolean('en_cartera')->default(false);
             $table->enum('metodo_pago', ['CREDITO', 'CONTADO'])->default('CREDITO');
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('DETAL');

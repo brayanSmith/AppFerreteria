@@ -16,6 +16,7 @@ class PedidosFacturadosForm
             self::placeholders(),
             self::sectionDatosGenerales(),
             self::sectionResumen(),
+            self::sectionComentarios(),
             self::sectionDetalles(),
             self::sectionAbonos()
         );

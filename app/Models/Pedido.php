@@ -15,6 +15,7 @@ class Pedido extends Model
         'codigo',
         'cliente_id',
         'fecha',
+        'dias_plazo_vencimiento',
         'fecha_vencimiento',
         'ciudad',
         'estado',
@@ -31,6 +32,7 @@ class Pedido extends Model
         'contador_impresiones',
         'impresa',
         'estado_pago',
+        'stock_retirado',
     ];
 
     protected $casts = [

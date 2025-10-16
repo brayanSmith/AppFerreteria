@@ -16,6 +16,9 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Placeholder;
 use Carbon\Carbon;
 use App\Models\Producto;
+use Dom\Text;
+
+use function Livewire\Volt\on;
 
 trait HasPedidoSections
 {
@@ -101,8 +104,9 @@ trait HasPedidoSections
         return [
             Section::make('Datos del pedido')
                 ->columns(4)
+                ->columnSpan(1)
                 ->schema([
-                    TextInput::make('codigo')->disabled()->columnSpan(1),
+                    TextInput::make('codigo')->disabled()->columnSpan(1)->label('Remisión'),
 
                     Select::make('cliente_id')
                         ->label('Cliente')
@@ -112,17 +116,37 @@ trait HasPedidoSections
                         ->preload()
                         ->columnSpan(3),
 
-                    DatePicker::make('fecha')->label('Fecha Registro')->required()->columnSpan(2),
+                    DatePicker::make('fecha')->label('Fecha de Facturación')->required()->columnSpan(2),
+                    TextInput::make('dias_plazo_vencimiento')->label('Días Plazo Vencimiento')->default(30)->numeric()->required()->reactive()
+                        ->afterStateUpdated(function ($state, $set, $get) {
+                            $fecha = $get('fecha');
+                            if ($fecha && $state !== null) {
+                                try {
+                                    $fechaCarbon = Carbon::parse($fecha);
+                                    $nuevaFechaVenc = $fechaCarbon->copy()->addDays((int) $state);
+                                    $set('fecha_vencimiento', $nuevaFechaVenc->toDateString());
+                                } catch (\Throwable $e) {
+                                    // no hacer nada si hay error
+                                }
+                            } else {
+                                $set('fecha_vencimiento', null);
+                            }
+                        })
+                        ->minValue(0)
+                        ->maxValue(365)
+                        ->step(1)
+                        ->helperText('Número de días para calcular la fecha de vencimiento a partir de la fecha de facturación.')
+                        ->columnSpan(2),
 
-                    DatePicker::make('fecha_vencimiento')->label('Fecha de vencimiento')->default(null)->columnSpan(2),
+                    DatePicker::make('fecha_vencimiento')->label('Fecha de Vencimiento')->default(null)->columnSpan(2)->readOnly(),
 
                     TextInput::make('ciudad')->default(null)->columnSpan(2),
 
-                    Select::make('estado')->options([
+                    ToggleButtons::make('estado')->options([
                         'PENDIENTE' => 'Pendiente',
                         'FACTURADO' => 'Facturado',
                         'ANULADO'   => 'Anulado',
-                    ])->default('PENDIENTE')->required()->columnSpan(2),
+                    ])->default('PENDIENTE')->required()->columnSpan(2)->grouped(),
 
                     Select::make('metodo_pago')->options(['CREDITO' => 'Crédito', 'CONTADO' => 'Contado'])->default('CREDITO')->required()->columnSpan(2),
 
@@ -160,6 +184,19 @@ trait HasPedidoSections
         ];
     }
 
+    //seccion primer comentario y segundo comentario
+    protected static function sectionComentarios(): array
+    {
+        return [
+            Section::make('Comentarios')
+                ->columns(1)
+                ->schema([
+                    Textarea::make('primer_comentario')->label('Primer Comentario')->rows(2)->columnSpanFull(),
+                    Textarea::make('segundo_comentario')->label('Segundo Comentario')->rows(2)->columnSpanFull(),
+                ])->columnSpanFull()->collapsed(true)->collapsible(),
+        ];
+    }
+
     // sección detalles
     protected static function sectionDetalles(): array
     {
@@ -183,6 +220,7 @@ trait HasPedidoSections
                             return $data;
                         })
                         ->table([
+                            TableColumn::make('Código')->width('50px'),
                             TableColumn::make('Producto')->markAsRequired()->width('200px'),
                             TableColumn::make('Cantidad')->markAsRequired()->width('100px'),
                             TableColumn::make('Precio Unitario')->markAsRequired()->width('100px'),
@@ -190,6 +228,12 @@ trait HasPedidoSections
                             TableColumn::make('Acciones')->width('10px'),
                         ])
                         ->schema([
+                            //vamos a traer el codigo del producto que se seleccione
+                            TextInput::make('producto.codigo_producto')
+                                ->disabled()
+                                ->live(onBlur: true)
+                                ->columnSpan(1),
+
                             Select::make('producto_id')
                                 ->label('Producto')
                                 ->relationship('producto', 'nombre_producto')
@@ -318,6 +362,7 @@ trait HasPedidoSections
         $totalPedido = collect($detalles)->sum(fn($d) => $d['subtotal'] ?? 0);
         $set('../../subtotal', $totalPedido);
         self::recalcularAbonos($set, $get);
+        self::buscarCodigoProducto($productoId);
     }
 
     private static function recalcularAbonos(callable $set, callable $get): void
@@ -342,5 +387,11 @@ trait HasPedidoSections
         $totalAPagar = $totalAPagar < 0 ? 0 : $totalAPagar;
         $currentTotal = (float) ($get($basePath . 'total_a_pagar') ?? 0);
         if (round($currentTotal, 4) !== round($totalAPagar, 4)) $set($basePath . 'total_a_pagar', $totalAPagar);
+    }
+
+    private static function buscarCodigoProducto(int $productoId): string
+    {
+        $producto = Producto::find($productoId);
+        return $producto ? $producto->codigo_producto : '-';
     }
 }

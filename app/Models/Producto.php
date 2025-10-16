@@ -22,7 +22,16 @@ class Producto extends Model
         'imagen_producto',
         'bodega_id',
         'stock',
-        'activo'
+        'activo',
+        'tipo_producto',
+        'peso_producto',
+        'ubicacion_producto',
+        'alerta_producto',
+        'empaquetado_externo',
+        'empaquetado_interno',
+        'referencia_producto',
+        'codigo_cliente',
+        'volumen_producto',
     ];
 
     public function detallePedidos()

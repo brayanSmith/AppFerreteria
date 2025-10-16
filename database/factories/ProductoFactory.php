@@ -39,6 +39,16 @@ class ProductoFactory extends Factory
             'sub_categoria_id' => $subCategoria?->id,
             'stock' => $this->faker->numberBetween(0, 100),
             'activo' => $this->faker->boolean(90), // 90% de probabilidad de estar activo
+            'tipo_producto' => $this->faker->randomElement(['HERRAMIENTA', 'MATERIAL', 'EQUIPO', 'ACCESORIO']),
+            'peso_producto' => $this->faker->randomFloat(2, 0.1, 100),
+            'ubicacion_producto' => $this->faker->word(),
+            'alerta_producto' => $this->faker->numberBetween(1, 20),
+            'empaquetado_externo' => $this->faker->word(),
+            'empaquetado_interno' => $this->faker->word(),
+            'referencia_producto' => strtoupper(Str::random(6)),
+            'codigo_cliente' => strtoupper(Str::random(10)),
+            'volumen_producto' => $this->faker->randomElement(['EXTRA_GRANDE', 'GRANDE', 'MEDIANO', 'PEQUEÑO', 'EXTRA_PEQUEÑO'])
+
         ];
     }
 }
