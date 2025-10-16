@@ -25,8 +25,9 @@ use function Livewire\Volt\on;
 trait HasPedidoSections
 {
     // placeholders informativos (vencimiento / proximo abono)
-    protected static function placeholders(): array
+    protected static function placeholders()
     {
+
         return [
             Placeholder::make('vencimiento_info')
                 ->content(function ($get) {
@@ -123,14 +124,10 @@ trait HasPedidoSections
                         })
                         ->columnSpan(3),
 
-                    // Toggle informativo (SI / NO). No se persiste en la BD.
-                    Toggle::make('retenedor_fuente_flag')
-                        ->label('Retenedor fuente')
-                        ->disabled()               // solo informativo: el usuario no lo cambia aquí
-                        ->dehydrated(false)        // no guardarlo en la BD
-                        ->columnSpan(1),
-
                     DatePicker::make('fecha')->label('Fecha de Facturación')->required()->columnSpan(2),
+
+                    TextInput::make('ciudad')->default(null)->columnSpan(2),
+
                     TextInput::make('dias_plazo_vencimiento')->label('Días Plazo Vencimiento')->default(30)->numeric()->required()->reactive()
                         ->afterStateUpdated(function ($state, $set, $get) {
                             $fecha = $get('fecha');
@@ -149,20 +146,12 @@ trait HasPedidoSections
                         ->minValue(0)
                         ->maxValue(365)
                         ->step(1)
-                        ->helperText('Número de días para calcular la fecha de vencimiento a partir de la fecha de facturación.')
+                        //->helperText('Número de días para calcular la fecha de vencimiento a partir de la fecha de facturación.')
                         ->columnSpan(2),
 
-                    DatePicker::make('fecha_vencimiento')->label('Fecha de Vencimiento')->default(null)->columnSpan(2)->readOnly(),
-
-                    TextInput::make('ciudad')->default(null)->columnSpan(2),
-
-                    ToggleButtons::make('estado')->options([
-                        'PENDIENTE' => 'Pendiente',
-                        'FACTURADO' => 'Facturado',
-                        'ANULADO'   => 'Anulado',
-                    ])->default('PENDIENTE')->required()->columnSpan(2)->grouped(),
-
                     Select::make('metodo_pago')->options(['CREDITO' => 'Crédito', 'CONTADO' => 'Contado'])->default('CREDITO')->required()->columnSpan(2),
+
+                    DatePicker::make('fecha_vencimiento')->label('Fecha de Vencimiento')->default(null)->columnSpan(2)->readOnly(),
 
                     ToggleButtons::make('tipo_precio')
                         ->options(['FERRETERO' => 'Ferretero', 'MAYORISTA' => 'Mayorista', 'DETAL' => 'Detal'])
@@ -173,12 +162,27 @@ trait HasPedidoSections
                         ->afterStateUpdated(fn($state, $set, $get) => self::recalcularTodo($set, $get, $state))
                         ->columnSpan(2),
 
+                    // Toggle informativo (SI / NO). No se persiste en la BD.
+                    Toggle::make('retenedor_fuente_flag')
+                        ->label('Retenedor fuente')
+                        ->disabled()               // solo informativo: el usuario no lo cambia aquí
+                        ->dehydrated(false)        // no guardarlo en la BD
+                        ->columnSpan(2),
+
+
+                    ToggleButtons::make('estado')->options([
+                        'PENDIENTE' => 'Pendiente',
+                        'FACTURADO' => 'Facturado',
+                        'ANULADO'   => 'Anulado',
+                    ])->default('PENDIENTE')->required()->columnSpan(2)->grouped(),
+
+
                     // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)
-                    Placeholder::make('estado_pago_info')
+                    /*Placeholder::make('estado_pago_info')
                         ->label('Estado pago')
                         ->content(fn($get) => $get('estado_pago') ?? 'EN_CARTERA')
                         ->extraAttributes(['class' => 'text-sm text-gray-600'])
-                        ->columnSpan(2),
+                        ->columnSpan(2),*/
                 ]),
         ];
     }
@@ -350,6 +354,7 @@ trait HasPedidoSections
                                 FileUpload::make('imagen')->label('Comprobante o evidencia')->directory('abonos')->image()->imagePreviewHeight('200')->columnSpanFull(),
                             ])->columnSpan(1),
                         ])
+                        ->addActionLabel('Añadir Abono')
                         ->columns(3)
                         ->columnSpan(4)
                         ->disabled(fn($get) => $get('estado') === 'ANULADO')
