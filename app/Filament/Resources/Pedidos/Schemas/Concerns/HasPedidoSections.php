@@ -173,13 +173,12 @@ trait HasPedidoSections
                         ->afterStateUpdated(fn($state, $set, $get) => self::recalcularTodo($set, $get, $state))
                         ->columnSpan(2),
 
-                    ToggleButtons::make('estado_pago')
-                        ->options(['EN_CARTERA' => 'En Cartera', 'SALDADO' => 'Saldado'])
-                        ->default('EN_CARTERA')
-                        ->grouped()
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(fn($state, $set, $get) => self::recalcularTodo($set, $get, $state)),
+                    // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)
+                    Placeholder::make('estado_pago_info')
+                        ->label('Estado pago')
+                        ->content(fn($get) => $get('estado_pago') ?? 'EN_CARTERA')
+                        ->extraAttributes(['class' => 'text-sm text-gray-600'])
+                        ->columnSpan(2),
                 ]),
         ];
     }
@@ -310,9 +309,8 @@ trait HasPedidoSections
                         ->addActionLabel('Añadir Producto')
                         ->deleteAction(fn(\Filament\Actions\Action $action) => $action->after(function ($record, $set, $get) {
                             self::recalcularTodo($set, $get, $get('tipo_precio'));
-
                         })),
-                ]) ,
+                ]),
         ];
     }
 
