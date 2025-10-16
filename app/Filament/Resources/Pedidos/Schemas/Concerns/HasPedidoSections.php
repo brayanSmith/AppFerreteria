@@ -228,10 +228,12 @@ trait HasPedidoSections
                             TableColumn::make('Acciones')->width('10px'),
                         ])
                         ->schema([
-                            //vamos a traer el codigo del producto que se seleccione
-                            TextInput::make('producto.codigo_producto')
+                            //campo para mostrar el código del producto seleccionado (no se guarda en BD)
+                            TextInput::make('codigo_producto')
+                                ->label('Código')
                                 ->disabled()
-                                ->live(onBlur: true)
+                                ->dehydrated(false) // evitar que se persista
+                                ->default(fn($get) => optional(Producto::find($get('producto_id')))->codigo_producto)
                                 ->columnSpan(1),
 
                             Select::make('producto_id')
@@ -241,7 +243,22 @@ trait HasPedidoSections
                                 ->required()
                                 ->preload()
                                 ->reactive()
-                                ->afterStateUpdated(fn($state, $set, $get) => self::recalcularFila($set, $get, $get('../../tipo_precio')))
+                                ->afterStateHydrated(function ($state, $set) {
+                                    // al hidratar fila (editar existente) rellenar código
+                                    $set('codigo_producto', $state ? optional(\App\Models\Producto::find($state))->codigo_producto : null);
+                                })
+                                ->afterStateUpdated(function ($state, $set, $get) {
+                                    // recalcular precios/subtotales
+                                    self::recalcularFila($set, $get, $get('../../tipo_precio'));
+
+                                    // rellenar campo código con el valor del producto seleccionado
+                                    $codigo = null;
+                                    if ($state) {
+                                        $p = Producto::find($state);
+                                        $codigo = $p?->codigo_producto ?? null;
+                                    }
+                                    $set('codigo_producto', $codigo);
+                                })
                                 ->columnSpan(2),
 
                             TextInput::make('cantidad')
@@ -259,7 +276,7 @@ trait HasPedidoSections
                                 ->default(0)
                                 ->required()
                                 ->live(onBlur: true)
-                                ->readOnly(true)
+                                //->readOnly(true)
                                 ->columnSpan(1),
 
                             TextInput::make('subtotal')
