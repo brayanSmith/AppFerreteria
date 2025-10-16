@@ -64,6 +64,9 @@ class PedidosFacturadosTable
                 ToggleColumn::make('impresa')
                     ->label('Impresa'),
 
+                TextColumn::make('tipo_venta')
+                    ->label('Tipo Venta'),
+
                 TextColumn::make('ciudad')
                     ->searchable(),
                 TextColumn::make('estado')
@@ -110,11 +113,11 @@ class PedidosFacturadosTable
                     ->multiple(),
             ])
             ->recordActions([
-                EditAction::make(),
+                //EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    //DeleteBulkAction::make(),
                 ]),
             ]);
     }

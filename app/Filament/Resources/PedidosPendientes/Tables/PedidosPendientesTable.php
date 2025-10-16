@@ -47,6 +47,8 @@ class PedidosPendientesTable
 
                 ToggleColumn::make('impresa')
                     ->label('Impresa'),
+                TextColumn::make('tipo_venta')
+                    ->label('Tipo Venta'),
 
                 TextColumn::make('metodo_pago')
                     ->badge()
@@ -86,7 +88,7 @@ class PedidosPendientesTable
 
             ])
             ->recordActions([
-                EditAction::make(),
+                //EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
