@@ -59,17 +59,26 @@ class ProductoForm
                 TextInput::make('costo_producto')
                     ->required()
                     ->inputMode('decimal')
+                    ->currencyMask(".", ",", 0)
+                    ->prefix('$')
                     ->numeric(),
                 TextInput::make('valor_detal_producto')
                     ->required()
                     ->inputMode('decimal')
+                    ->currencyMask(".", ",", 0)
+                    ->prefix('$')
                     ->numeric(),
                 TextInput::make('valor_mayorista_producto')
                     ->required()
                     ->inputMode('decimal')
+                    ->currencyMask(".", ",", 0)
+                    ->prefix('$')
                     ->numeric(),
                 TextInput::make('valor_ferretero_producto')
                     ->required()
+                    ->inputMode('decimal')
+                    ->currencyMask(".", ",", 0)
+                    ->prefix('$')
                     ->numeric(),
 
                 FileUpload::make('imagen_producto')
