@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         CategoriaSeeder::class,
         SubCategoriaSeeder::class,
         RutaSeeder::class,
+        ProveedorSeeder::class,
         ]);
 
         User::factory()->create([

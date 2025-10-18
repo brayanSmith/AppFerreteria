@@ -51,9 +51,12 @@ class PedidoObserver
                         continue;
                     }
 
-                    // política: impedir stock negativo (ajustar a 0) o lanzar excepción si prefieres
-                    $nuevo = max(0, ($producto->stock ?? 0) - $qty);
-                    $producto->stock = $nuevo;
+                    // disminuir stock (sin negativo) y aumentar salidas
+                    $nuevoStock = max(0, ($producto->stock ?? 0) - $qty);
+                    $nuevoSalidas = ($producto->salidas ?? 0) + $qty;
+
+                    $producto->stock = $nuevoStock;
+                    $producto->salidas = $nuevoSalidas;
                     $producto->save();
                 }
 
@@ -75,7 +78,9 @@ class PedidoObserver
                         continue;
                     }
 
+                    // aumentar stock y disminuir salidas sin dejar salidas negativas
                     $producto->stock = ($producto->stock ?? 0) + $qty;
+                    $producto->salidas = max(0, ($producto->salidas ?? 0) - $qty);
                     $producto->save();
                 }
 

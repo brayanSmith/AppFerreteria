@@ -273,7 +273,7 @@ class POS extends Component
                 //actualizar ek stock
                 $inventario = Producto::find($producto['id']);
                 if ($inventario) {
-                    $inventario->stock -= $producto['cantidad'];
+                    //$inventario->stock -= $producto['cantidad'];
                     $inventario->save();
                 }
             }

@@ -21,7 +21,7 @@ class PedidosEstadoPagoEnCarteraResource extends Resource
     protected static ?string $model = Pedido::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string|UnitEnum|null $navigationGroup = 'Cartera';
+    protected static string|UnitEnum|null $navigationGroup = 'Cartera Ventas';
     //protected static ?string $navigationParentItem = 'Pedidos';
     //protected static ?int $navigationSort = 1;
 
@@ -46,11 +46,11 @@ class PedidosEstadoPagoEnCarteraResource extends Resource
     }
     public static function getNavigationLabel(): string
     {
-        return 'Pagos en Cartera';
+        return 'Cuentas por Cobrar';
     }
     public static function getPluralLabel(): string
     {
-        return 'Pagos en Cartera';
+        return 'Cuentas por Cobrar';
     }
 
     public static function getPages(): array

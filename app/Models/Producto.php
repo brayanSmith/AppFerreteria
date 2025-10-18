@@ -22,6 +22,8 @@ class Producto extends Model
         'imagen_producto',
         'bodega_id',
         'stock',
+        'entradas',
+        'salidas',
         'activo',
         'tipo_producto',
         'peso_producto',
@@ -33,15 +35,26 @@ class Producto extends Model
         'codigo_cliente',
         'volumen_producto',
     ];
+    public function detalleCompras()
+    {
+        return $this->hasMany(DetalleCompra::class);
+    }
 
     public function detallePedidos()
     {
         return $this->hasMany(DetallePedido::class);
     }
 
-    public function enStock($cantidad)
+    public function enStock(float|int $cantidad): bool
     {
-        return $this->stock >= $cantidad;
+        // cantidad inválida
+        if ($cantidad <= 0) {
+            return false;
+        }
+
+        $stock = (float) ($this->stock ?? 0);
+
+        return $stock >= (float) $cantidad;
     }
 
 
