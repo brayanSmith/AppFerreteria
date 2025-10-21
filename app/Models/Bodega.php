@@ -15,5 +15,13 @@ class Bodega extends Model
     {
         return $this->hasMany(Producto::class);
     }
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
+    public function traslados()
+    {
+        return $this->hasMany(Traslado::class);
+    }
 
 }

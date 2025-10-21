@@ -74,8 +74,8 @@ class ListProductos extends Component implements HasActions, HasSchemas, HasTabl
                     ->money('COP')
                     ->sortable(),
 
-                TextColumn::make('bodega_id')
-                    ->numeric()
+                TextColumn::make('Bodega.nombre_bodega')
+                    ->label('Bodega')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -120,6 +120,7 @@ class ListProductos extends Component implements HasActions, HasSchemas, HasTabl
 
     public function render(): View
     {
+        //return view('livewire.productos.list-productos');
         return view('livewire.productos.list-productos');
     }
 }

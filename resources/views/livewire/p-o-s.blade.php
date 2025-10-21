@@ -85,66 +85,7 @@
                                 'ciudad' => $ciudad,
                                 'clientes' => $clientes,
                             ])
-
-
-                            {{-- @include('livewire.partials.selected-search', [
-                                'cliente_id' => $cliente_id,
-                                'ciudad' => $ciudad,
-                                'clientes' => $clientes,
-                            ]) --}}
-
-                            {{-- - @include('livewire.partials.searchable-client-select', [
-                                'clientes' => $clientes,
-                                'model' => 'cliente_id',
-                                'placeholder' => 'Seleccione un cliente',
-                            ]) --}}
-                            {{-- <x-filament::input.wrapper id="cliente" class="w-full">
-                                <x-filament::input.select wire:model="cliente_id" id="cliente"
-                                    placeholder="Seleccione un cliente">
-                                    <option value="">Seleccione un cliente</option>
-                                    @foreach ($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
-                                    @endforeach
-                                </x-filament::input.select>
-                            </x-filament::input.wrapper> --}}
-                            {{-- <x-filament::select wire:model="cliente_id" placeholder="Seleccione un cliente" searchable
-                                :options="$clientes->pluck('razon_social', 'id')" /> --}}
-
-                            {{-- -<x-filament::input.wrapper>
-                                <x-filament::input.select id="cliente" wire:model="cliente_id">
-                                    <option value="">Seleccione un cliente</option>
-                                    @foreach ($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
-                                    @endforeach
-                                </x-filament::input.select>
-                            </x-filament::input.wrapper> --}}
-
-
-                            {{-- <select wire:model="cliente_id" id="cliente"
-                                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
-                           focus:border-blue-500 focus:ring-blue-500
-                           dark:bg-neutral-900 dark:border-neutral-700
-                           dark:text-neutral-400 dark:placeholder-neutral-500
-                           dark:focus:ring-neutral-600">
-                                <option value="">Seleccione un cliente</option>
-                                @foreach ($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}">{{ $cliente->razon_social }}</option>
-                                @endforeach
-                            </select> --}}
                         </div>
-
-                        {{-- Ciudad
-                        <div class="space-y-2">
-                            <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Ciudad
-                            </label>
-                            <input type="text" id="ciudad" wire:model="ciudad" placeholder="Escriba la Ciudad"
-                                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm
-                           focus:border-blue-500 focus:ring-blue-500
-                           dark:bg-neutral-900 dark:border-neutral-700
-                           dark:text-neutral-400 dark:placeholder-neutral-500
-                           dark:focus:ring-neutral-600">
-                        </div> --}}
 
                         {{-- ...Metodo de Pago... --}}
                         <div class="mt-4">
@@ -238,6 +179,18 @@
                             <textarea id="segundo_comentario" wire:model="segundo_comentario" rows="2"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100"
                                 placeholder="Escribe el segundo comentario..."></textarea>
+                        </div>
+                        {{-- -Bodegas --}}
+                        <div class="mt-4">
+                            <label for="bodega_id"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bodega</label>
+                            <select id="bodega_id" wire:model="bodegaSeleccionada"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100">
+                                <option value="">Selecciona una bodega</option>
+                                @foreach($bodegas as $bodega)
+                                    <option value="{{ $bodega->id }}">{{ $bodega->nombre_bodega }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">

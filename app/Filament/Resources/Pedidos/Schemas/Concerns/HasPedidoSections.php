@@ -181,6 +181,14 @@ trait HasPedidoSections
                         'ELECTRONICA' => 'Electrónica',
                     ])->required()->columnSpan(2),
 
+                    Select::make('bodega_id')
+                        ->label('Bodega')
+                        ->relationship('bodega', 'nombre_bodega')
+                        ->searchable()
+                        ->required()
+                        ->preload()
+                        ->columnSpan(2),
+
 
                     // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)
                     /*Placeholder::make('estado_pago_info')
@@ -261,6 +269,11 @@ trait HasPedidoSections
                             Select::make('producto_id')
                                 ->label('Producto')
                                 ->relationship('producto', 'nombre_producto')
+                                ->options(fn() => Producto::orderBy('nombre_producto')
+                                    ->get()
+                                    ->mapWithKeys(fn($p) => [$p->id => ($p->codigo_producto ? $p->codigo_producto . ' - ' : '') . $p->nombre_producto])
+                                    ->toArray()
+                                )
                                 ->searchable()
                                 ->required()
                                 ->preload()

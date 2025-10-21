@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Productos\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -49,8 +50,8 @@ class ProductosTable
                     ->numeric()
                     ->sortable(),
 
-                TextColumn::make('bodega_id')
-                    ->numeric()
+                TextColumn::make('Bodega.nombre_bodega')
+                    ->label('Bodega')
                     ->sortable(),
 
                 TextColumn::make('stock')
@@ -65,13 +66,81 @@ class ProductosTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                //crearemos una columna virtual que muestre cuanto se ha trasladado en la bodega con el id = 1
+                TextColumn::make('trasladado_bodega_1')
+                    ->label('Trasladado Bodega 1')
+                    ->getStateUsing(function ($record) {
+                        $trasladado = \App\Models\Traslado::where('producto_id', $record->id)
+                            ->where('bodega_id', 1)
+                            ->sum('cantidad');
+                        $ventas = \App\Models\DetallePedido::where('producto_id', $record->id)
+                            ->whereHas('pedido', function ($query) {
+                                $query->where('bodega_id', 1)
+                                    ->where('estado', 'FACTURADO');
+                            })
+                            ->sum('cantidad');
+                        $stockBodega1= $trasladado -= $ventas;
+                        return $stockBodega1;
+                    }),
+
+                    TextColumn::make('trasladado_bodega_2')
+                    ->label('Trasladado Bodega 2')
+                    ->getStateUsing(function ($record) {
+                        $trasladado = \App\Models\Traslado::where('producto_id', $record->id)
+                            ->where('bodega_id', 2)
+                            ->sum('cantidad');
+                        $ventas = \App\Models\DetallePedido::where('producto_id', $record->id)
+                            ->whereHas('pedido', function ($query) {
+                                $query->where('bodega_id', 2)
+                                    ->where('estado', 'FACTURADO');
+                            })
+                            ->sum('cantidad');
+                        $stockBodega2= $trasladado -= $ventas;
+                        return $stockBodega2;
+                    }),
             ])
             ->filters([
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
+                //ViewAction::make(),
                 EditAction::make(),
+
+                //Vamos a crear una accion que me abra un modal correspondiente al modelo Traslado
+                Action::make('crearTraslado')
+                    ->label('Crear Traslado')
+                    ->modalHeading('Crear Traslado')
+                    ->modalWidth('md')
+                    ->form([
+                        // Campo para seleccionar la bodega
+                        \Filament\Forms\Components\Select::make('bodega_id')
+                            ->label('Bodega')
+                            ->relationship('Bodega', 'nombre_bodega')
+                            ->required(),
+
+                        // Campo para ingresar la cantidad a trasladar
+                        \Filament\Forms\Components\TextInput::make('cantidad')
+                            ->label('Cantidad')
+                            ->numeric()
+                            ->minValue(1)
+                            ->required(),
+
+                        // Campo para observaciones
+                        \Filament\Forms\Components\Textarea::make('observaciones')
+                            ->label('Observaciones')
+                            ->rows(2),
+                    ])
+                    ->action(function ($record, $data) {
+                        // Crear el traslado usando el modelo Traslado
+                        \App\Models\Traslado::create([
+                            'producto_id'      => $record->id,
+                            'bodega_id'       => $data['bodega_id'],
+                            'cantidad'         => $data['cantidad'],
+                            'observaciones'    => $data['observaciones'] ?? null,
+                        ]);
+                        // Opcional: puedes actualizar stock, mostrar notificación, etc.
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Bodega>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Traslado>
  */
-class BodegaFactory extends Factory
+class TrasladoFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +18,6 @@ class BodegaFactory extends Factory
     {
         return [
             //
-            /*'nombre_bodega' => $this->faker->company(),
-            'ubicacion_bodega' => $this->faker->address(),*/
         ];
     }
 }

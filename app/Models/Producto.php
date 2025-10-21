@@ -78,6 +78,11 @@ class Producto extends Model
         return $this->hasMany(DetalleProduccion::class);
     }
 
+    public function traslados()
+    {
+        return $this->hasMany(Traslado::class);
+    }
+
     public function getPrecioPorTipo(string $tipo): float
     {
         return match ($tipo) {

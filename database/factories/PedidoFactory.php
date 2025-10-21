@@ -24,6 +24,7 @@ class PedidoFactory extends Factory
         $fechaVenc = $this->faker->optional()->dateTimeBetween('now', '+1 month');
 
         return [
+            'bodega_id' => \App\Models\Bodega::factory(),
             'codigo' => $this->faker->unique()->bothify('PED-####'),
             'cliente_id' => Cliente::factory(), // crea cliente si no existe
             'fecha' => $this->faker->dateTimeThisYear(),
