@@ -49,6 +49,9 @@ class ProductosTable
                 TextColumn::make('valor_ferretero_producto')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('tipo_producto')
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('Bodega.nombre_bodega')
                     ->label('Bodega')
@@ -69,7 +72,7 @@ class ProductosTable
 
                 //crearemos una columna virtual que muestre cuanto se ha trasladado en la bodega con el id = 1
                 TextColumn::make('trasladado_bodega_1')
-                    ->label('Trasladado Bodega 1')
+                    ->label('Stock Bodega 1')
                     ->getStateUsing(function ($record) {
                         $trasladado = \App\Models\Traslado::where('producto_id', $record->id)
                             ->where('bodega_id', 1)
@@ -85,7 +88,7 @@ class ProductosTable
                     }),
 
                     TextColumn::make('trasladado_bodega_2')
-                    ->label('Trasladado Bodega 2')
+                    ->label('Stock Bodega 2')
                     ->getStateUsing(function ($record) {
                         $trasladado = \App\Models\Traslado::where('producto_id', $record->id)
                             ->where('bodega_id', 2)

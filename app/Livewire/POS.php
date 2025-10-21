@@ -52,8 +52,8 @@ class POS extends Component
     public $ciudades = [];
     public $ciudadSeleccionada;
     public $direccionSeleccionada;
-    public $bodegaSeleccionada;
-    public $bodegas = [];
+    //public $bodegaSeleccionada;
+    //public $bodegas = [];
 
 
     public function mount()
@@ -61,7 +61,7 @@ class POS extends Component
 
         $this->clientes = Cliente::orderBy('razon_social')->get();
         $this->ciudades = Cliente::select('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad')->toArray();
-        $this->bodegas = \App\Models\Bodega::all();
+        //$this->bodegas = \App\Models\Bodega::all();
     }
 
     // Actualizar ciudad cuando se selecciona un cliente
@@ -257,7 +257,7 @@ class POS extends Component
                 'ciudad' => $this->ciudadSeleccionada,
                 //vamos a hacer que la fecha de vencimiento sea 30 dias despues de la fecha actual
                 'fecha_vencimiento' => now()->addDays(30)->toDateString(),
-                'bodega_id' => $this->bodegaSeleccionada,
+                'bodega_id' => 1, //por defecto bodega 1
 
             ]);
 
@@ -296,7 +296,7 @@ class POS extends Component
             $this->segundo_comentario = '';
             $this->ciudadSeleccionada = '';
             $this->direccionSeleccionada = '';
-            $this->bodegaSeleccionada = '';
+            //$this->bodegaSeleccionada = '';
 
             // Guardar la URL del PDF en la sesión para mostrar el botón en la modal
             session(['pedido_pdf_url' => route('pedidos.pdf.download', $pedido->id)]);

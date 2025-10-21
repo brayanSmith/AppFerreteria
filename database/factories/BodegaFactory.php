@@ -18,8 +18,8 @@ class BodegaFactory extends Factory
     {
         return [
             //
-            /*'nombre_bodega' => $this->faker->company(),
-            'ubicacion_bodega' => $this->faker->address(),*/
+            'nombre_bodega' => $this->faker->company(),
+            'ubicacion_bodega' => $this->faker->address(),
         ];
     }
 }

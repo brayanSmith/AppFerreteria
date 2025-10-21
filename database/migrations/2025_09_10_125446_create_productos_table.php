@@ -64,6 +64,7 @@ return new class extends Migration
             $table->string('referencia_producto')->nullable();
             $table->string('codigo_cliente')->nullable();
             $table->enum('volumen_producto', ['EXTRA_GRANDE', 'GRANDE', 'MEDIANO', 'PEQUEÑO', 'EXTRA_PEQUEÑO'])->nullable();
+            $table->float('iva_producto')->default(0);
             $table->timestamps();
         });
 

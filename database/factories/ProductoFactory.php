@@ -47,8 +47,8 @@ class ProductoFactory extends Factory
             'empaquetado_interno' => $this->faker->word(),
             'referencia_producto' => strtoupper(Str::random(6)),
             'codigo_cliente' => strtoupper(Str::random(10)),
-            'volumen_producto' => $this->faker->randomElement(['EXTRA_GRANDE', 'GRANDE', 'MEDIANO', 'PEQUEÑO', 'EXTRA_PEQUEÑO'])
-
+            'volumen_producto' => $this->faker->randomElement(['EXTRA_GRANDE', 'GRANDE', 'MEDIANO', 'PEQUEÑO', 'EXTRA_PEQUEÑO']),
+            'iva_producto' => $this->faker->randomFloat(2, 0, 100),
         ];
     }
 }

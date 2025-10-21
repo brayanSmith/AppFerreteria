@@ -27,7 +27,7 @@ return new class extends Migration
             $table->enum('tipo_precio', ['FERRETERO','MAYORISTA', 'DETAL'])->default('FERRETERO');
             $table->enum('tipo_venta', ['ELECTRONICA','REMISIONADA'])->default('REMISIONADA');
             $table->enum('estado_pago', ['EN_CARTERA', 'SALDADO'])->default('EN_CARTERA');
-            $table->foreignId('bodega_id')->constrained('bodegas')->nullable()->default(null);
+            $table->foreignId('bodega_id')->constrained('bodegas')->nullable()->default(1);
             $table->text('primer_comentario')->nullable();
             $table->text('segundo_comentario')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);

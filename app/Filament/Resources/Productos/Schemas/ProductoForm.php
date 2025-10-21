@@ -162,6 +162,12 @@ class ProductoForm
                     ->default('MEDIANO')
                     ->grouped(),
 
+                TextInput::make('iva_producto')
+                    ->label('IVA (%)')
+                    ->suffix('%')
+                    ->required()
+                    ->numeric()
+                    ->default(0),
 
 
                 Toggle::make('activo')
