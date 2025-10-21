@@ -27,6 +27,8 @@ class ClientesTable
                     ->searchable(),
                 TextColumn::make('ciudad')
                     ->searchable(),
+                TextColumn::make('role')
+                    ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),

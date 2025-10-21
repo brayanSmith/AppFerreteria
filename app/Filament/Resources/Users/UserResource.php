@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -35,6 +36,8 @@ class UserResource extends Resource
             ->components([
                 TextInput::make('name')
                     ->required(),
+                TextInput::make('role')
+                    ->required(),
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
@@ -44,6 +47,22 @@ class UserResource extends Resource
                 TextInput::make('password')
                     ->password()
                     ->required(),
+
+                Select::make('role')
+                    ->options([
+                        'ADMIN' => 'ADMIN',
+                        'COMERCIAL' => 'COMERCIAL',
+                        'BODEGA' => 'BODEGA',
+                        'FINANCIERO' => 'FINANCIERO',
+                        'GERENTE' => 'GERENTE',
+                        'CONDUCTOR' => 'CONDUCTOR',
+                        'LOGISTICA' => 'LOGISTICA',
+                        'CASINO' => 'CASINO',
+                        'ALMACEN' => 'ALMACEN',
+                        'USER' => 'USER',
+                    ])
+                    ->default('USER')
+                    ->required(),
             ]);
     }
 
@@ -52,6 +71,7 @@ class UserResource extends Resource
         return $schema
             ->components([
                 TextEntry::make('name'),
+                TextEntry::make('role'),
                 TextEntry::make('email')
                     ->label('Email address'),
                 TextEntry::make('email_verified_at')
@@ -72,6 +92,8 @@ class UserResource extends Resource
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('role')
                     ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')

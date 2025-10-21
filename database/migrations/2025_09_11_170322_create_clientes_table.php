@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('activo')->default(true);
             $table->string('novedad')->nullable();
             $table->foreignId('ruta_id')->constrained('rutas')->cascadeOnDelete();
-            $table->string('comercial')->nullable();
+            $table->foreignId('comercial_id')->constrained('users')->cascadeOnDelete();
             $table->enum('tipo_cliente', ['ELECTRONICO', 'REMISIONADO'])->default('ELECTRONICO');
             $table->string('rut_imagen')->nullable();
             $table->enum('retenedor_fuente', ['SI', 'NO'])->default('NO');

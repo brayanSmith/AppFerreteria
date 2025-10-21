@@ -52,8 +52,11 @@ class ClienteForm
                         'Moroso' => 'Moroso',
                     ])
                     ->default(null),
-                TextInput::make('comercial')
+                Select::make('comercial_id')
                     ->label('Comercial')
+                    ->relationship('comercial', 'name', fn ($query) => $query->where('role', 'COMERCIAL'))
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 ToggleButtons::make('tipo_cliente')
                     ->label('Tipo Cliente')

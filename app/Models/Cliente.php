@@ -21,7 +21,7 @@ class Cliente extends Model
         'activo',
         'novedad',
         'ruta_id',
-        'comercial',
+        'comercial_id',
         'tipo_cliente',
         'rut_imagen',
         'retenedor_fuente',
@@ -34,5 +34,9 @@ class Cliente extends Model
     public function ruta()
     {
         return $this->belongsTo(Ruta::class, 'ruta_id');
+    }
+    public function comercial()
+    {
+        return $this->belongsTo(User::class, 'comercial_id');
     }
 }

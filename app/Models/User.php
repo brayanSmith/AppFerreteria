@@ -24,6 +24,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -66,6 +67,10 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Abono::class, 'user_id');
     }
 
+    public function clientes()
+    {
+        return $this->hasMany(Cliente::class, 'comercial_id');
+    }
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
