@@ -238,18 +238,18 @@
         </div>
     </div>
 
-    <div class="flex h-screen bg-gray-100 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
+    <div class="flex h-screen bg-gray-300 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
 
         <!-- Panel izquierdo -->
-        <div class="w-full p-6 flex flex-col">
+        <div class="w-full px-1 py-6 md:px-6 flex flex-col">
 
             <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-                Products
+                Productos
             </h2>
 
             <!-- Buscador -->
             <div class="flex-shrink-0 mb-4">
-                <input wire:model.live="search" type="text" placeholder="Search products by name or SKU..."
+                <input wire:model.live="search" type="text" placeholder="Buscar productos por nombre o SKU..."
                     class="w-full px-5 py-3 border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
                        dark:bg-neutral-800 dark:border-blue-700 dark:text-gray-100">
 
@@ -269,14 +269,21 @@
             </div>
 
             <!-- Listado de productos -->
-            <div class="flex-grow overflow-y-auto pr-2">
+            <div class="flex-grow overflow-y-auto pr-1">
                 @php($products = $this->filteredProducts) {{-- paginator --}}
                 <div class="grid grid-cols-1 gap-2 md:gap-6">
                     @forelse($products as $product)
                         <div wire:key="prod-{{ $product->id }}"
                             class="bg-green-300 dark:bg-neutral-800 rounded-2xl shadow-lg">
-                            <div
-                                class="bg-red-200 dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-2 md:p-4">
+                            <div class="bg-red-200 dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-2 md:p-4">
+
+                                <!-- Encabezado: Nombre del producto -->
+                                <div class="w-full mb-2">
+                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-base md:text-lg w-full">
+                                        {{ $product->nombre_producto }}
+                                    </h3>
+                                </div>
+
                                 <!-- Flex fila en móvil, grid en desktop -->
                                 <div class="flex flex-row items-center gap-3 md:grid md:grid-cols-12 md:gap-4">
                                     <!-- Imagen -->
@@ -292,9 +299,6 @@
 
                                     <!-- Info -->
                                     <div class="flex-1 md:col-span-6 ml-2 md:ml-0">
-                                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-base md:text-lg">
-                                            {{ $product->nombre_producto }}
-                                        </h3>
                                         <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
                                             {{ $product->codigo_producto }}</p>
                                         <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">DETAL:
