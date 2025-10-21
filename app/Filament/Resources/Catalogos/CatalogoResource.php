@@ -82,7 +82,7 @@ class CatalogoResource extends Resource
                     TextColumn::make('codigo_producto')
                         ->searchable()
                         ->extraAttributes([
-                            'class' => 'text-xs text-gray-700 font-bold', // tamaño pequeño y gris oscuro
+                             'class' => 'text-xs text-yellow-500 font-bold', // pequeño, amarillo y negrita
                         ]),
 
                     TextColumn::make('costo_producto')

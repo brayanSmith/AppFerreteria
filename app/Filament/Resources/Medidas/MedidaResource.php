@@ -15,13 +15,14 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class MedidaResource extends Resource
 {
     protected static ?string $model = Medida::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static string | UnitEnum | null $navigationGroup = 'Producción';
     protected static ?string $recordTitleAttribute = 'nombre_medida';
 
     public static function form(Schema $schema): Schema

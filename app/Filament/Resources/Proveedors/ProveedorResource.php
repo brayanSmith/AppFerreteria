@@ -18,12 +18,14 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ProveedorResource extends Resource
 {
     protected static ?string $model = Proveedor::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string | UnitEnum | null $navigationGroup = 'Users';
 
     protected static ?string $recordTitleAttribute = 'razon_social_proveedor';
 

@@ -29,29 +29,33 @@ class ProductosTable
                 TextColumn::make('nombre_producto')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('descripcion_producto')
-                    ->searchable(),
-                TextColumn::make('Categoria.nombre_categoria')
+                /*TextColumn::make('descripcion_producto')
+                    ->searchable(),*/
+                /*TextColumn::make('Categoria.nombre_categoria')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('SubCategoria.nombre_sub_categoria')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(),*/
                 TextColumn::make('costo_producto')
+                    ->label('Costo')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('valor_detal_producto')
+                    ->label('Detal')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('valor_mayorista_producto')
+                    ->label('Mayorista')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('valor_ferretero_producto')
+                    ->label('Ferretero')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('tipo_producto')
+                /*TextColumn::make('tipo_producto')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(),*/
 
                 TextColumn::make('Bodega.nombre_bodega')
                     ->label('Bodega')
