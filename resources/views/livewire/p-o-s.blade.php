@@ -238,7 +238,7 @@
         </div>
     </div>
 
-    <div class="flex h-screen bg-gray-300 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
+    <div class="flex h-screen bg-gray-100 dark:bg-neutral-900 font-sans antialiased text-gray-800 dark:text-gray-100">
 
         <!-- Panel izquierdo -->
         <div class="w-full px-1 py-6 md:px-6 flex flex-col">
@@ -274,8 +274,8 @@
                 <div class="grid grid-cols-1 gap-2 md:gap-6">
                     @forelse($products as $product)
                         <div wire:key="prod-{{ $product->id }}"
-                            class="bg-green-300 dark:bg-neutral-800 rounded-2xl shadow-lg">
-                            <div class="bg-red-200 dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-2 md:p-4">
+                            class="bg-grey-100 dark:bg-neutral-800 rounded-2xl shadow-lg">
+                            <div class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-2 md:p-4">
 
                                 <!-- Encabezado: Nombre del producto -->
                                 <div class="w-full mb-2">
@@ -363,13 +363,14 @@
                     @endforelse
                 </div>
 
-                <!-- Paginación Filament -->
+
+            </div>
+            <!-- Paginación Filament -->
                 <div class="mt-6">
                     <x-filament::pagination :paginator="$products" :page-options="[5, 10, 20, 50, 'all']" current-page-option-property="perPage"
                         {{-- ← sin dos puntos --}} extreme-links />
 
                 </div>
-            </div>
         </div>
     </div>
 </div>
