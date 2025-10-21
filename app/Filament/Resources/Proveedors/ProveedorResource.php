@@ -41,7 +41,7 @@ class ProveedorResource extends Resource
                     ->required()
                     ->maxLength(255),
                 FileUpload::make('rut_proveedor_imagen')
-                    ->required()
+                    //->required()
                     ->image()
                     ->maxSize(2048),
                 Select::make('tipo_proveedor')
