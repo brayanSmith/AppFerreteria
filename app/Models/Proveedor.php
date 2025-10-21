@@ -14,6 +14,7 @@ class Proveedor extends Model
 
     protected $fillable = [
         'id',
+        'nombre_proveedor',
         'razon_social_proveedor',
         'nit_proveedor',
         'rut_proveedor_imagen',
