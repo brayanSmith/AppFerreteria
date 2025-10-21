@@ -274,9 +274,9 @@
                 <div class="grid grid-cols-1 gap-2 md:gap-6">
                     @forelse($products as $product)
                         <div wire:key="prod-{{ $product->id }}"
-                            class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg">
+                            class="bg-green-300 dark:bg-neutral-800 rounded-2xl shadow-lg">
                             <div
-                                class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-4">
+                                class="bg-red-200 dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-200 transform hover:scale-105 hover:shadow-xl p-2 md:p-4">
                                 <!-- Flex fila en móvil, grid en desktop -->
                                 <div class="flex flex-row items-center gap-3 md:grid md:grid-cols-12 md:gap-4">
                                     <!-- Imagen -->
