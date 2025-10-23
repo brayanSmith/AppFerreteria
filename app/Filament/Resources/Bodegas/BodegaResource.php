@@ -15,12 +15,15 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class BodegaResource extends Resource
 {
     protected static ?string $model = Bodega::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Productos';
 
     protected static ?string $recordTitleAttribute = 'nombre_bodega';
 

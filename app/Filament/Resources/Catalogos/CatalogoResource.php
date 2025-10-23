@@ -20,13 +20,14 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
+use UnitEnum;
 
 class CatalogoResource extends Resource
 {
     protected static ?string $model = Producto::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Productos';
 
     protected static ?string $recordTitleAttribute = 'codigo_producto';
 
@@ -83,17 +84,7 @@ class CatalogoResource extends Resource
                         ->searchable()
                         ->extraAttributes([
                              'class' => 'text-xs text-yellow-500 font-bold', // pequeño, amarillo y negrita
-                        ]),
-
-                    TextColumn::make('costo_producto')
-                        ->label('Costo')
-                        ->formatStateUsing(fn($state) => 'Costo: $' . number_format($state, 0)),
-                    //->money('COP', true),
-                    TextColumn::make('valor_detal_producto')
-                        ->formatStateUsing(fn($state) => 'Detal: $' . number_format($state, 0)),
-                    TextColumn::make('valor_mayorista_producto')
-                        ->label('Mayorista')
-                        ->formatStateUsing(fn($state) => 'Mayorista: $' . number_format($state, 0)),
+                        ]),                    
                     TextColumn::make('valor_ferretero_producto')
                         ->label('Ferretero')
                         ->formatStateUsing(fn($state) => 'Ferretero: $' . number_format($state, 0)),
