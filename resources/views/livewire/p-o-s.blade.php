@@ -302,11 +302,11 @@
                                     <div class="flex-1 md:col-span-6 ml-2 md:ml-0">
                                         <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
                                             {{ $product->codigo_producto }}</p>
-                                        <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">DETAL:
+                                        <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-400 mt-1">DETAL:
                                             {{ number_format($product->valor_detal_producto, 0) }}</p>
-                                        <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">FERRETERO:
+                                        <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-400 mt-1">FERRETERO:
                                             {{ number_format($product->valor_ferretero_producto, 0) }}</p>
-                                        <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">MAYORISTA:
+                                        <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-400 mt-1">MAYORISTA:
                                             {{ number_format($product->valor_mayorista_producto, 0) }}</p>
                                     </div>
 
