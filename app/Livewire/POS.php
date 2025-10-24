@@ -58,10 +58,75 @@ class POS extends Component
 
     public function mount()
     {
+        // Cargar datos persistentes desde la sesión
+        $this->loadFromSession();
 
         $this->clientes = Cliente::orderBy('razon_social')->get();
         $this->ciudades = Cliente::select('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad')->toArray();
         //$this->bodegas = \App\Models\Bodega::all();
+    }
+
+    /**
+     * Cargar datos del POS desde la sesión
+     */
+    private function loadFromSession()
+    {
+        $posData = session()->get('pos_data', []);
+        
+        if (!empty($posData)) {
+            $this->cart = $posData['cart'] ?? [];
+            $this->cliente_id = $posData['cliente_id'] ?? null;
+            $this->metodo_pago = $posData['metodo_pago'] ?? 'CREDITO';
+            $this->tipo_precio = $posData['tipo_precio'] ?? 'FERRETERO';
+            $this->tipo_venta = $posData['tipo_venta'] ?? 'REMISIONADA';
+            $this->primer_comentario = $posData['primer_comentario'] ?? '';
+            $this->segundo_comentario = $posData['segundo_comentario'] ?? '';
+            $this->ciudad = $posData['ciudad'] ?? '';
+            $this->direccion = $posData['direccion'] ?? '';
+            $this->ciudadSeleccionada = $posData['ciudadSeleccionada'] ?? '';
+            $this->direccionSeleccionada = $posData['direccionSeleccionada'] ?? '';
+        }
+    }
+
+    /**
+     * Guardar datos del POS en la sesión
+     */
+    private function saveToSession()
+    {
+        $posData = [
+            'cart' => $this->cart,
+            'cliente_id' => $this->cliente_id,
+            'metodo_pago' => $this->metodo_pago,
+            'tipo_precio' => $this->tipo_precio,
+            'tipo_venta' => $this->tipo_venta,
+            'primer_comentario' => $this->primer_comentario,
+            'segundo_comentario' => $this->segundo_comentario,
+            'ciudad' => $this->ciudad,
+            'direccion' => $this->direccion,
+            'ciudadSeleccionada' => $this->ciudadSeleccionada,
+            'direccionSeleccionada' => $this->direccionSeleccionada,
+        ];
+        
+        session()->put('pos_data', $posData);
+    }
+
+    /**
+     * Limpiar datos del POS de la sesión
+     */
+    public function clearSession()
+    {
+        session()->forget('pos_data');
+        $this->cart = [];
+        $this->cliente_id = null;
+        $this->metodo_pago = 'CREDITO';
+        $this->tipo_precio = 'FERRETERO';
+        $this->tipo_venta = 'REMISIONADA';
+        $this->primer_comentario = '';
+        $this->segundo_comentario = '';
+        $this->ciudad = '';
+        $this->direccion = '';
+        $this->ciudadSeleccionada = '';
+        $this->direccionSeleccionada = '';
     }
 
     // Actualizar ciudad cuando se selecciona un cliente
@@ -80,6 +145,7 @@ class POS extends Component
     // 2) Normaliza ID (evita '0', '', 'abc', etc.)
     $id = filter_var($value, FILTER_VALIDATE_INT) ?: null;
     if (!$id) {
+        $this->saveToSession(); // Guardar cambios
         return; // selección vacía o inválida
     }
 
@@ -95,6 +161,7 @@ class POS extends Component
             if (property_exists($this, 'direccion')) {
                 $this->direccion = $this->direccionSeleccionada;
             }
+            $this->saveToSession(); // Guardar cambios
             return;
         }
     }
@@ -107,6 +174,7 @@ class POS extends Component
     if (!$cliente) {
         // Si usas Tom Select / Select2 puedes limpiar el widget en el front:
         // $this->dispatch('reset-cliente-select'); // JS hará ts.clear() / $el.val(null).trigger('change')
+        $this->saveToSession(); // Guardar cambios
         return;
     }
 
@@ -119,6 +187,39 @@ class POS extends Component
         if (property_exists($this, 'direccion')) {
             $this->direccion = $this->direccionSeleccionada;
         }
+        
+        $this->saveToSession(); // Guardar cambios
+    }
+
+    // Interceptar cambios en propiedades importantes para guardar en sesión
+    public function updatedMetodoPago()
+    {
+        $this->saveToSession();
+    }
+
+    public function updatedTipoPrecio()
+    {
+        $this->saveToSession();
+    }
+
+    public function updatedTipoVenta()
+    {
+        $this->saveToSession();
+    }
+
+    public function updatedPrimerComentario()
+    {
+        $this->saveToSession();
+    }
+
+    public function updatedSegundoComentario()
+    {
+        $this->saveToSession();
+    }
+
+    public function updatedCart()
+    {
+        $this->saveToSession();
     }
 
     // Resetear la página cuando cambia el buscador o el tamaño de página
@@ -199,11 +300,18 @@ class POS extends Component
                 'cantidad' => $cantidad,
             ];
         }
+        
+        // Guardar en sesión después de agregar al carrito
+        $this->saveToSession();
     }
+    
     //remover productos del carro
     public function removeFromCart($productoId)
     {
         unset($this->cart[$productoId]);
+        
+        // Guardar en sesión después de remover del carrito
+        $this->saveToSession();
     }
 
     //actualizar la cantidad en el producto del carro por item
@@ -284,9 +392,8 @@ class POS extends Component
             }
             DB::commit();
 
-            //reset cart
+            //reset cart y otras propiedades
             $this->cart = [];
-            //resetear otras propiedades
             $this->search = '';
             $this->cliente_id = null;
             $this->metodo_pago = "CREDITO";
@@ -297,6 +404,9 @@ class POS extends Component
             $this->ciudadSeleccionada = '';
             $this->direccionSeleccionada = '';
             //$this->bodegaSeleccionada = '';
+
+            // Limpiar datos de la sesión después de completar la venta
+            $this->clearSession();
 
             // Guardar la URL del PDF en la sesión para mostrar el botón en la modal
             session(['pedido_pdf_url' => route('pedidos.pdf.download', $pedido->id)]);

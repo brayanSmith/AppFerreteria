@@ -208,8 +208,16 @@
                         <button wire:click="checkout" wire:loading.attr="disabled"
                             class="w-full py-4 bg-green-600 text-white font-bold text-lg rounded-lg
                        transition-colors duration-200 hover:bg-green-700
-                       disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+                       disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mb-3">
                             Finalizar Venta
+                        </button>
+                        
+                        <!-- Botón para limpiar carrito -->
+                        <button wire:click="clearSession" 
+                            class="w-full py-2 bg-red-500 text-white font-medium text-sm rounded-lg
+                       transition-colors duration-200 hover:bg-red-600 shadow-md"
+                            onclick="return confirm('¿Estás seguro de que quieres limpiar el carrito? Esta acción no se puede deshacer.')">
+                            Limpiar Carrito
                         </button>
                     </div>
                 </div>
@@ -245,6 +253,16 @@
 
             <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                 Productos
+                
+                <!-- Indicador de datos guardados -->
+                @if(count($this->cart) > 0 || $cliente_id || $primer_comentario || $segundo_comentario)
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Datos guardados
+                    </span>
+                @endif
             </h2>
 
             <!-- Buscador -->
