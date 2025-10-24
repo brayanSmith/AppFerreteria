@@ -5,4 +5,13 @@
 @source '../../../../resources/views/livewire/p-o-s.blade.php';
 @source '../../../../resources/views/livewire/partials/searchable-client-select.blade.php';
 
+/* Hacer más pequeña la fuente del elemento de navegación POS */
+.fi-sidebar-nav-item-label {
+    font-size: 0.55rem !important; /* 12px - un poco más pequeño que el default */
+}
+
+/* O si solo quieres afectar el POS específicamente, puedes usar el atributo de navegación */
+[data-sidebar-nav-item][href*="pos"] .fi-sidebar-nav-item-label {
+    font-size: 0.525rem !important; /* 10px - mucho más pequeño */
+}
 

@@ -279,7 +279,7 @@
 
                                 <!-- Encabezado: Nombre del producto -->
                                 <div class="w-full mb-2">
-                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-base md:text-lg w-full">
+                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-base md:text-md w-full">
                                         {{ $product->nombre_producto }}
                                     </h3>
                                 </div>
