@@ -12,7 +12,7 @@ class Pos extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'pos';
+        return 'Pos';
     }
 
     //vamos hacer que el titulo no se muestre

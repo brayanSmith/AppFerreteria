@@ -279,9 +279,10 @@
 
                                 <!-- Encabezado: Nombre del producto -->
                                 <div class="w-full mb-2">
-                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 break-words text-base md:text-md w-full">
+                                    {{--<p class="font-semibold text-gray-900 dark:text-gray-100 break-words text-sm md:text-base w-full">--}}
+                                         <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mt-1 font-bold">
                                         {{ $product->nombre_producto }}
-                                    </h3>
+                                    </p>
                                 </div>
 
                                 <!-- Flex fila en móvil, grid en desktop -->
