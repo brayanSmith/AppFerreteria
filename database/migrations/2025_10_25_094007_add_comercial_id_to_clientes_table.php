@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('clientes', function (Blueprint $table) {
             //
+            $table->foreignId('comercial_id')->constrained('users')->cascadeOnDelete();
         });
     }
 
@@ -23,6 +24,8 @@ return new class extends Migration
     {
         Schema::table('clientes', function (Blueprint $table) {
             //
+            $table->dropForeign(['comercial_id']);
+            $table->dropColumn('comercial_id');
         });
     }
 };
