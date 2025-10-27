@@ -9,6 +9,10 @@ use App\Filament\Widgets\SegmentadorProductosWidget;
 use App\Filament\Widgets\ProductosActivosWidget;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ImportAction;
+use App\Filament\Imports\ProductoImporter;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\ProductoExporter;
 
 class ListProductos extends ListRecords
 {
@@ -29,6 +33,10 @@ class ListProductos extends ListRecords
     {
         return [
             CreateAction::make(),
+            ImportAction::make()
+                ->importer(ProductoImporter::class),
+            ExportAction::make()
+                ->exporter(ProductoExporter::class),
         ];
     }
 }

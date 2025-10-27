@@ -34,10 +34,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Producto::factory(5000)->create();
+        //Producto::factory(2)->create();
         Cliente::factory(50)->create();
 
-        Pedido::factory()
+        /*Pedido::factory()
             ->count(20)
             ->has(
                 DetallePedido::factory()->count(10),
@@ -49,6 +49,6 @@ class DatabaseSeeder extends Seeder
                 $pedido->update([
                     'subtotal' => $pedido->detalles->sum('subtotal')
                 ]);
-            });
+            });*/
     }
 }

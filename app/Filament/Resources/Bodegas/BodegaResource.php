@@ -59,6 +59,7 @@ class BodegaResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                
                 ]),
             ]);
     }

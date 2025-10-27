@@ -58,7 +58,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-
+            ->databaseNotifications()
             ->viteTheme('resources/css/filament/admin/theme.css')
 
             // 👇 AQUI registras tus CDN

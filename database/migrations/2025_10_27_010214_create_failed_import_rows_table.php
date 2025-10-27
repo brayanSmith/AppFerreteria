@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('clientes', function (Blueprint $table) {
-            //
-            //$table->foreignId('comercial_id')->constrained('users')->cascadeOnDelete();
+        Schema::create('failed_import_rows', function (Blueprint $table): void {
+            $table->id();
+            $table->json('data');
+            $table->foreignId('import_id')->constrained()->cascadeOnDelete();
+            $table->text('validation_error')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -22,10 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clientes', function (Blueprint $table) {
-            //
-            //$table->dropForeign(['comercial_id']);
-            //$table->dropColumn('comercial_id');
-        });
+        Schema::dropIfExists('failed_import_rows');
     }
 };

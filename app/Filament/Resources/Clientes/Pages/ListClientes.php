@@ -5,6 +5,10 @@ namespace App\Filament\Resources\Clientes\Pages;
 use App\Filament\Resources\Clientes\ClienteResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Imports\ClienteImporter;
+use Filament\Actions\ImportAction;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\ClienteExporter;
 
 class ListClientes extends ListRecords
 {
@@ -14,6 +18,10 @@ class ListClientes extends ListRecords
     {
         return [
             CreateAction::make(),
+            ImportAction::make()
+                ->importer(ClienteImporter::class),
+            ExportAction::make()
+                ->exporter(ClienteExporter::class),
         ];
     }
 }

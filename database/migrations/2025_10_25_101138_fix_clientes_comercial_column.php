@@ -11,17 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
         Schema::table('clientes', function (Blueprint $table) {
-        if (Schema::hasColumn('clientes', 'comercial')) {
-            $table->dropColumn('comercial');
-        }
+            // Eliminar la columna comercial solo si existe
+            /*if (Schema::hasColumn('clientes', 'comercial')) {
+                $table->dropColumn('comercial');
+            }
 
-        $table->foreignId('comercial_id')
-            ->nullable()
-            ->constrained('users')
-            ->nullOnDelete();
-    });
+            // Agregar comercial_id solo si no existe
+            if (!Schema::hasColumn('clientes', 'comercial_id')) {
+                $table->foreignId('comercial_id')
+                    ->nullable()
+                    ->constrained('users')
+                    ->nullOnDelete();
+            }*/
+        });
     }
 
     /**
@@ -29,12 +32,22 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
         Schema::table('clientes', function (Blueprint $table) {
-        $table->dropForeign(['comercial_id']);
-        $table->dropColumn('comercial_id');
+            // Verificar si la clave foránea existe antes de eliminarla
+            if (Schema::hasColumn('clientes', 'comercial_id')) {
+                // Intentar eliminar la clave foránea solo si existe
+                try {
+                    $table->dropForeign(['comercial_id']);
+                } catch (\Exception $e) {
+                    // Si no existe la clave foránea, continúa sin error
+                }
+                $table->dropColumn('comercial_id');
+            }
 
-        $table->string('comercial')->nullable();
-    });
+            // Agregar la columna comercial solo si no existe
+            if (!Schema::hasColumn('clientes', 'comercial')) {
+                $table->string('comercial')->nullable();
+            }
+        });
     }
 };
