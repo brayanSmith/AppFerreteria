@@ -28,6 +28,7 @@ class Pedido extends Model
         'en_cartera',
         'abono',
         'descuento',
+        'flete',
         'total_a_pagar',
         'contador_impresiones',
         'impresa',

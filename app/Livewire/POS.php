@@ -36,6 +36,7 @@ class POS extends Component
     public $cliente_id = null;
 
     public $valor_decuento = 0; //
+    public $flete = 0; // Valor del flete
     public $metodo_pago = "CREDITO";
     public $tipo_precio = "FERRETERO";
     public $tipo_venta = "REMISIONADA";
@@ -81,6 +82,7 @@ class POS extends Component
             $this->tipo_venta = $posData['tipo_venta'] ?? 'REMISIONADA';
             $this->primer_comentario = $posData['primer_comentario'] ?? '';
             $this->segundo_comentario = $posData['segundo_comentario'] ?? '';
+            $this->flete = $posData['flete'] ?? 0;
             $this->ciudad = $posData['ciudad'] ?? '';
             $this->direccion = $posData['direccion'] ?? '';
             $this->ciudadSeleccionada = $posData['ciudadSeleccionada'] ?? '';
@@ -101,6 +103,7 @@ class POS extends Component
             'tipo_venta' => $this->tipo_venta,
             'primer_comentario' => $this->primer_comentario,
             'segundo_comentario' => $this->segundo_comentario,
+            'flete' => $this->flete,
             'ciudad' => $this->ciudad,
             'direccion' => $this->direccion,
             'ciudadSeleccionada' => $this->ciudadSeleccionada,
@@ -123,6 +126,7 @@ class POS extends Component
         $this->tipo_venta = 'REMISIONADA';
         $this->primer_comentario = '';
         $this->segundo_comentario = '';
+        $this->flete = 0;
         $this->ciudad = '';
         $this->direccion = '';
         $this->ciudadSeleccionada = '';
@@ -217,6 +221,20 @@ class POS extends Component
         $this->saveToSession();
     }
 
+    public function updatedFlete($value)
+    {
+        // Limpiar el valor: remover caracteres no numéricos excepto punto y coma
+        $cleanValue = preg_replace('/[^\d,.]/', '', $value);
+        
+        // Reemplazar coma por punto para decimales
+        $cleanValue = str_replace(',', '.', $cleanValue);
+        
+        // Convertir a float y asegurar que no sea negativo
+        $this->flete = max(0, (float) $cleanValue);
+        
+        $this->saveToSession();
+    }
+
     public function updatedCart()
     {
         $this->saveToSession();
@@ -252,9 +270,11 @@ class POS extends Component
     #[Computed]
     public function subtotal()
     {
-        return collect($this->cart)->sum(function ($producto) {
+        $subtotalProductos = collect($this->cart)->sum(function ($producto) {
             return $this->getPrecioProducto($producto) * $producto['cantidad'];
         });
+        
+        return $subtotalProductos + $this->flete;
     }
 
 
@@ -360,6 +380,7 @@ class POS extends Component
                 'tipo_venta' => $this->tipo_venta,
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
+                'flete' => $this->flete,
                 'subtotal' => $this->subtotal(),
                 //'ciudad' => $this->ciudad,
                 'ciudad' => $this->ciudadSeleccionada,
@@ -403,6 +424,7 @@ class POS extends Component
             $this->segundo_comentario = '';
             $this->ciudadSeleccionada = '';
             $this->direccionSeleccionada = '';
+            $this->flete = 0;
             //$this->bodegaSeleccionada = '';
 
             // Limpiar datos de la sesión después de completar la venta

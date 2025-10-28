@@ -209,6 +209,7 @@ trait HasPedidoSections
                     TextInput::make('subtotal')->currencyMask(".", ",", 0)->prefix('$')->readOnly()->numeric(),
                     TextInput::make('abono')->prefix('$')->currencyMask(".", ",", 0)->readOnly()->numeric(),
                     TextInput::make('descuento')->prefix('$')->currencyMask(".", ",", 0)->numeric()->live(onBlur: true)->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
+                    TextInput::make('flete')->prefix('$')->currencyMask(".", ",", 0)->numeric()->live(onBlur: true)->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
                     TextInput::make('total_a_pagar')->label('Total a pagar')->prefix('$')->currencyMask(".", ",", 0)->readOnly()->numeric(),
                 ])->columnSpan(1),
         ];
@@ -442,8 +443,9 @@ trait HasPedidoSections
         $currentAbono = (float) ($get($basePath . 'abono') ?? 0);
         if (round($currentAbono, 4) !== round($totalAbonos, 4)) $set($basePath . 'abono', $totalAbonos);
         $subtotal = (float) ($get($basePath . 'subtotal') ?? 0);
+        $flete = (float) ($get($basePath . 'flete') ?? 0);
         $descuento = (float) ($get($basePath . 'descuento') ?? 0);
-        $totalAPagar = $subtotal - $totalAbonos - $descuento;
+        $totalAPagar = $subtotal + $flete - $totalAbonos - $descuento;
         $totalAPagar = $totalAPagar < 0 ? 0 : $totalAPagar;
         $currentTotal = (float) ($get($basePath . 'total_a_pagar') ?? 0);
         if (round($currentTotal, 4) !== round($totalAPagar, 4)) $set($basePath . 'total_a_pagar', $totalAPagar);

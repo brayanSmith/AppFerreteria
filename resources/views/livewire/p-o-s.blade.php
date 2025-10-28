@@ -192,7 +192,16 @@
                                 @endforeach
                             </select>
                         </div>--}}
-
+                        
+                        {{--flete--}}
+                        <div class="mt-4">
+                            <label for="flete"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Flete (COP)</label>
+                            <input type="text" id="flete" wire:model.blur="flete" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-100"
+                                placeholder="Ingresa el valor del flete..." />
+                        </div>  
+                         {{-- Total a pagar --}}
                         <div class="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700">
 
                             <div class="flex justify-between items-center mb-2 text-lg font-bold">
