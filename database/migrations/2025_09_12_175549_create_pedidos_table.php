@@ -37,6 +37,7 @@ return new class extends Migration
             $table->decimal('total_a_pagar', 12, 2)->default(0);
             $table->integer('contador_impresiones')->default(0);
             $table->boolean('impresa')->default(false);
+            $table->foreignId('user_id')->constrained('users')->nullable()->default(1);
             $table->timestamps();
         });
     }

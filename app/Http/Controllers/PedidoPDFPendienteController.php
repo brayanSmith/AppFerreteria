@@ -7,7 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PedidoPDFPendienteController extends Controller
 {
-    public function download($id)
+    public function download($id) 
     {
         $pedido = Pedido::with(['cliente', 'detalles.producto'])->findOrFail($id);
 

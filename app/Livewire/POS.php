@@ -55,12 +55,18 @@ class POS extends Component
     public $direccionSeleccionada;
     //public $bodegaSeleccionada;
     //public $bodegas = [];
+    public $user_id = null;
 
 
     public function mount()
     {
         // Cargar datos persistentes desde la sesión
         $this->loadFromSession();
+
+        // Si no hay user_id en sesión, usar el usuario logueado
+        if (!$this->user_id) {
+            $this->user_id = auth()->id();
+        }
 
         $this->clientes = Cliente::orderBy('razon_social')->get();
         $this->ciudades = Cliente::select('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad')->toArray();
@@ -87,6 +93,7 @@ class POS extends Component
             $this->direccion = $posData['direccion'] ?? '';
             $this->ciudadSeleccionada = $posData['ciudadSeleccionada'] ?? '';
             $this->direccionSeleccionada = $posData['direccionSeleccionada'] ?? '';
+            $this->user_id = $posData['user_id'] ?? null;
         }
     }
 
@@ -108,6 +115,7 @@ class POS extends Component
             'direccion' => $this->direccion,
             'ciudadSeleccionada' => $this->ciudadSeleccionada,
             'direccionSeleccionada' => $this->direccionSeleccionada,
+            'user_id' => $this->user_id,
         ];
         
         session()->put('pos_data', $posData);
@@ -131,6 +139,7 @@ class POS extends Component
         $this->direccion = '';
         $this->ciudadSeleccionada = '';
         $this->direccionSeleccionada = '';
+        $this->user_id = auth()->id(); // Mantener el usuario logueado
     }
 
     // Actualizar ciudad cuando se selecciona un cliente
@@ -374,6 +383,7 @@ class POS extends Component
             $pedido = Pedido::create([
 
                 'cliente_id' => $this->cliente_id,
+                'user_id' => $this->user_id,
                 'estado' => 'PENDIENTE',
                 'metodo_pago' => $this->metodo_pago,
                 'tipo_precio' => $this->tipo_precio,
@@ -425,6 +435,7 @@ class POS extends Component
             $this->ciudadSeleccionada = '';
             $this->direccionSeleccionada = '';
             $this->flete = 0;
+            $this->user_id = auth()->id(); // Mantener el usuario logueado
             //$this->bodegaSeleccionada = '';
 
             // Limpiar datos de la sesión después de completar la venta

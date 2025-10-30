@@ -189,6 +189,13 @@ trait HasPedidoSections
                         ->preload()
                         ->columnSpan(2),
 
+                    Select::make('user_id')
+                        ->label('Vendedor')
+                        ->relationship('user', 'name')
+                        ->searchable()
+                        ->required()
+                        ->preload()
+                        ->columnSpan(2),
 
                     // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)
                     /*Placeholder::make('estado_pago_info')

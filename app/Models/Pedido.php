@@ -35,6 +35,7 @@ class Pedido extends Model
         'estado_pago',
         'stock_retirado',
         'bodega_id',
+        'user_id',
     ];
 
     protected $casts = [
@@ -56,6 +57,10 @@ class Pedido extends Model
     public function bodega()
     {
         return $this->belongsTo(Bodega::class, 'bodega_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
 
