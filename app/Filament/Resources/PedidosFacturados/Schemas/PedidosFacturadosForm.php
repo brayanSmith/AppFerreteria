@@ -18,7 +18,7 @@ class PedidosFacturadosForm
             self::sectionResumen(),
             self::sectionComentarios(),
             self::sectionDetalles(),
-            self::sectionAbonos()
+            //self::sectionAbonos()
         );
 
         return $schema->components($components);

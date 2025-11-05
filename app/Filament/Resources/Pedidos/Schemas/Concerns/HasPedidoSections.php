@@ -160,34 +160,29 @@ trait HasPedidoSections
                         ->required()
                         ->reactive()
                         ->afterStateUpdated(fn($state, $set, $get) => self::recalcularTodo($set, $get, $state))
-                        ->columnSpan(2),
-
-                    // Toggle informativo (SI / NO). No se persiste en la BD.
-                    Toggle::make('retenedor_fuente_flag')
-                        ->label('Retenedor fuente')
-                        ->disabled()               // solo informativo: el usuario no lo cambia aquí
-                        ->dehydrated(false)        // no guardarlo en la BD
-                        ->columnSpan(2),
+                        ->columnSpan(2),                   
 
 
                     ToggleButtons::make('estado')->options([
                         'PENDIENTE' => 'Pendiente',
                         'FACTURADO' => 'Facturado',
                         'ANULADO'   => 'Anulado',
-                    ])->default('PENDIENTE')->required()->columnSpan(2)->grouped(),
+                    ])->default('PENDIENTE')->required()->columnSpan(4)->grouped(),
+
+                    
 
                     Select::make('tipo_venta')->options([
                         'REMISIONADA' => 'Remisionada',
                         'ELECTRONICA' => 'Electrónica',
                     ])->required()->columnSpan(2),
 
-                    Select::make('bodega_id')
+                    /*Select::make('bodega_id')
                         ->label('Bodega')
                         ->relationship('bodega', 'nombre_bodega')
                         ->searchable()
                         ->required()
                         ->preload()
-                        ->columnSpan(2),
+                        ->columnSpan(2),*/
 
                     Select::make('user_id')
                         ->label('Vendedor')
@@ -195,6 +190,13 @@ trait HasPedidoSections
                         ->searchable()
                         ->required()
                         ->preload()
+                        ->columnSpan(2),
+
+                        // Toggle informativo (SI / NO). No se persiste en la BD.
+                    Toggle::make('retenedor_fuente_flag')
+                        ->label('Retenedor fuente')
+                        ->disabled()               // solo informativo: el usuario no lo cambia aquí
+                        ->dehydrated(false)        // no guardarlo en la BD
                         ->columnSpan(2),
 
                     // El estado de pago ahora se controla automáticamente al guardar (no editable manualmente aquí)

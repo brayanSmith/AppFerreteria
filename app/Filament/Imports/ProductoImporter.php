@@ -26,19 +26,19 @@ class ProductoImporter extends Importer
             ImportColumn::make('costo_producto')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required']),
             ImportColumn::make('valor_detal_producto')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required']),
             ImportColumn::make('valor_mayorista_producto')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required']),
             ImportColumn::make('valor_ferretero_producto')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required']),
             ImportColumn::make('imagen_producto')
                 ->rules(['max:255']),
             ImportColumn::make('bodega_id')
@@ -72,8 +72,8 @@ class ProductoImporter extends Importer
             ImportColumn::make('tipo_producto')
                 ->rules(['max:255']),
             ImportColumn::make('peso_producto')
-                ->numeric()
-                ->rules(['integer']),
+                ->numeric(),
+                //->rules(['double']),
             ImportColumn::make('ubicacion_producto')
                 ->rules(['max:255']),
             ImportColumn::make('alerta_producto')
@@ -92,7 +92,7 @@ class ProductoImporter extends Importer
             ImportColumn::make('iva_producto')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required']),
         ];
     }
 

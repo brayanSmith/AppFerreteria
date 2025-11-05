@@ -110,7 +110,7 @@
                                 </button>
                             </div>
                         </div>
-                        {{-- ...Tipo de Precio... --}}
+                        {{-- ...Tipo de Precio... 
 
                         <div class="mt-4">
                             <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de
@@ -138,7 +138,7 @@
                                     DETAL
                                 </button>
                             </div>
-                        </div>
+                        </div>--}}
 
                         {{-- ...Tipo de Venta... --}}
                         <div class="mt-4">
