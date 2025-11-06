@@ -14,6 +14,7 @@ class DetalleCompra extends Model
         'producto_id',
         'cantidad',
         'precio_unitario',
+        'iva',
         'subtotal',
     ];
 

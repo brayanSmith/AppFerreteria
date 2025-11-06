@@ -258,21 +258,22 @@ trait HasCompraSections
                             return $data;
                         })
                         ->table([
-                            TableColumn::make('Código')->width('50px'),
+                            //TableColumn::make('Código')->width('50px'),
                             TableColumn::make('Producto')->markAsRequired()->width('200px'),
                             TableColumn::make('Cantidad')->markAsRequired()->width('100px'),
                             TableColumn::make('Precio Unitario')->markAsRequired()->width('100px'),
+                            TableColumn::make('IVA')->markAsRequired()->width('100px'),
                             TableColumn::make('Subtotal')->markAsRequired()->width('100px'),
                             TableColumn::make('Acciones')->width('10px'),
                         ])
                         ->schema([
                             //campo para mostrar el código del producto seleccionado (no se guarda en BD)
-                            TextInput::make('codigo_producto')
+                            /*TextInput::make('codigo_producto')
                                 ->label('Código')
                                 ->disabled()
                                 ->dehydrated(false) // evitar que se persista
                                 ->default(fn($get) => optional(Producto::find($get('producto_id')))->codigo_producto)
-                                ->columnSpan(1),
+                                ->columnSpan(1),*/
 
                             Select::make('producto_id')
                                 ->label('Producto')
@@ -322,11 +323,18 @@ trait HasCompraSections
                                 // ahora editable por el usuario; si el usuario cambia este valor
                                 // recalculamos subtotal sin sobreescribir el precio
                                 ->readOnly(false)
-                                ->afterStateUpdated(function ($state, $set, $get) {
-                                    // recalcula solo con el precio unitario proporcionado por el usuario
-                                    self::recalcularDesdePrecioManual($set, $get);
-                                })
+                                ->afterStateUpdated(fn($state, $set, $get) => self::recalcularFila($set, $get))
                                 ->columnSpan(1),
+
+                                TextInput::make('iva')
+                                    ->prefix('%')
+                                    //->percentageMask(",", ".")
+                                    ->numeric()
+                                    ->default(0)
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn($state, $set, $get) => self::recalcularFila($set, $get))
+                                    ->columnSpan(1),
 
                             TextInput::make('subtotal')
                                 ->prefix('$')
@@ -440,7 +448,7 @@ trait HasCompraSections
         $cantidad   = $get('cantidad') ?? 0;
         $precio     = $get('precio_unitario') ?? 0;
 
-        if ($productoId && (empty($precio) || $precio == 0)) {
+        /*if ($productoId && (empty($precio) || $precio == 0)) {
             $producto = Producto::find($productoId);
             if ($producto) {
                 // Usar costo_producto como valor por defecto; si no existe, caer a precio según tipo
@@ -448,9 +456,12 @@ trait HasCompraSections
                 // sólo setear precio_unitario si no había un precio manual
                 $set('precio_unitario', $precio);
             }
-        }
+        }*/
+        $iva = $get('iva') ?? 0;
+        $ivaFactor = 1 + ($iva / 100);
+        $precioConIva = $precio * $ivaFactor;
 
-        $subtotal = $cantidad * $precio;
+        $subtotal = $cantidad * $precioConIva;
         $set('subtotal', $subtotal);
 
         // detectar clave del repeater para recalcular subtotal general
