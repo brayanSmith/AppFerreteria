@@ -169,6 +169,14 @@ class ProductoForm
                     ->numeric()
                     ->default(0),
 
+                Select::make('tipo_compra')
+                    ->label('Tipo de Compra')
+                    ->options([
+                        'NACIONAL' => 'Nacional',
+                        'IMPORTADO' => 'Importado',
+                    ])
+                    ->required()
+                    ->default('NACIONAL'),
 
                 Toggle::make('activo')
                     ->required()

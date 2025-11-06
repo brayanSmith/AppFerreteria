@@ -35,6 +35,7 @@ class Producto extends Model
         'codigo_cliente',
         'volumen_producto',
         'iva_producto',
+        'tipo_compra',
     ];
     public function detalleCompras()
     {

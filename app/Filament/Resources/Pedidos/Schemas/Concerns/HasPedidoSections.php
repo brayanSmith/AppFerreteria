@@ -260,21 +260,22 @@ trait HasPedidoSections
                             return $data;
                         })
                         ->table([
-                            TableColumn::make('Código')->width('50px'),
+                            //TableColumn::make('Código')->width('50px'),
                             TableColumn::make('Producto')->markAsRequired()->width('200px'),
                             TableColumn::make('Cantidad')->markAsRequired()->width('100px'),
                             TableColumn::make('Precio Unitario')->markAsRequired()->width('100px'),
+                            TableColumn::make('IVA')->markAsRequired()->width('100px'),
                             TableColumn::make('Subtotal')->markAsRequired()->width('100px'),
                             TableColumn::make('Acciones')->width('10px'),
                         ])
                         ->schema([
                             //campo para mostrar el código del producto seleccionado (no se guarda en BD)
-                            TextInput::make('codigo_producto')
+                            /*TextInput::make('codigo_producto')
                                 ->label('Código')
                                 ->disabled()
                                 ->dehydrated(false) // evitar que se persista
                                 ->default(fn($get) => optional(Producto::find($get('producto_id')))->codigo_producto)
-                                ->columnSpan(1),
+                                ->columnSpan(1),*/
 
                             Select::make('producto_id')
                                 ->label('Producto')
@@ -291,6 +292,7 @@ trait HasPedidoSections
                                 ->afterStateHydrated(function ($state, $set) {
                                     // al hidratar fila (editar existente) rellenar código
                                     $set('codigo_producto', $state ? optional(Producto::find($state))->codigo_producto : null);
+                                    $set('iva', $state ? optional(Producto::find($state))->iva_producto : null);
                                 })
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     // recalcular precios/subtotales
@@ -303,6 +305,7 @@ trait HasPedidoSections
                                         $codigo = $p?->codigo_producto ?? null;
                                     }
                                     $set('codigo_producto', $codigo);
+                                    $set('iva', $state ? optional(Producto::find($state))->iva_producto : null);
                                 })
                                 ->columnSpan(2),
 
@@ -312,6 +315,7 @@ trait HasPedidoSections
                                 ->required()
                                 ->live(onBlur: true)
                                 ->afterStateUpdated(fn($state, $set, $get) => self::recalcularFila($set, $get, $get('../../tipo_precio')))
+                                
                                 ->columnSpan(1),
 
                             TextInput::make('precio_unitario')
@@ -328,6 +332,23 @@ trait HasPedidoSections
                                     // recalcula solo con el precio unitario proporcionado por el usuario
                                     self::recalcularDesdePrecioManual($set, $get);
                                 })
+                                ->columnSpan(1),
+
+                            TextInput::make('iva')
+                                ->label('IVA')
+                                ->prefix('%')
+                                ->numeric()
+                                ->required()
+                                ->live(onBlur: true) 
+                                /*->default(function ($get) {
+                                    $producto = Producto::find($get('producto_id'));
+                                    return $producto ? $producto->iva_producto : 0;
+                                })*/
+                                ->afterStateUpdated(function ($state, $set, $get) {
+                                    // recalcula solo con el precio unitario proporcionado por el usuario
+                                    self::recalcularDesdePrecioManual($set, $get);
+                                })                              
+                                
                                 ->columnSpan(1),
 
                             TextInput::make('subtotal')
@@ -405,8 +426,10 @@ trait HasPedidoSections
             if (! $producto) continue;
             $precio = $producto->getPrecioPorTipo($tipoPrecio);
             $cantidad = $detalle['cantidad'] ?? 0;
-            $subtotal = $cantidad * $precio;
-            $set("detalles.$index.precio_unitario", $precio);
+            $iva = $detalle['iva'] ?? 0;
+            $precioConIva = $precio * (1 + ($iva / 100));
+            $subtotal = $cantidad * $precioConIva;
+            $set("detalles.$index.precio_unitario", $precioConIva);
             $set("detalles.$index.subtotal", $subtotal);
             $subtotalGeneral += $subtotal;
         }
@@ -419,6 +442,8 @@ trait HasPedidoSections
         $productoId = $get('producto_id');
         $cantidad   = $get('cantidad') ?? 0;
         $precio     = $get('precio_unitario') ?? 0;
+        $iva        = $get('iva') ?? 0;
+        // obtener precio según tipo de precio
         if ($productoId) {
             $producto = Producto::find($productoId);
             if ($producto) {
@@ -426,7 +451,9 @@ trait HasPedidoSections
                 $set('precio_unitario', $precio);
             }
         }
-        $subtotal = $cantidad * $precio;
+        $precioConIva = $precio * (1 + ($iva / 100));
+        // calcular subtotal
+        $subtotal = $cantidad * $precioConIva;
         $set('subtotal', $subtotal);
         $detalles = $get('../../detalles') ?? [];
         $totalPedido = collect($detalles)->sum(fn($d) => $d['subtotal'] ?? 0);
@@ -466,12 +493,15 @@ trait HasPedidoSections
         return $producto ? $producto->codigo_producto : '-';
     }
 
+    // recalcula subtotal desde precio unitario manual
     private static function recalcularDesdePrecioManual(callable $set, callable $get): void
     {
         $cantidad = (float) ($get('cantidad') ?? 0);
         $precio = (float) ($get('precio_unitario') ?? 0);
+        $iva = (float) ($get('iva') ?? 0);
+        $precioConIva = $precio * (1 + ($iva / 100));
 
-        $subtotal = $cantidad * $precio;
+        $subtotal = $cantidad * $precioConIva;
         $set('subtotal', $subtotal);
 
         // recalcular subtotal general del pedido (busca en el contexto del repeater)
