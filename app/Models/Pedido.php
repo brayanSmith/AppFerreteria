@@ -29,6 +29,7 @@ class Pedido extends Model
         'abono',
         'descuento',
         'flete',
+        'iva',
         'total_a_pagar',
         'contador_impresiones',
         'impresa',

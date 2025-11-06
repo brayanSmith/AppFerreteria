@@ -17,7 +17,7 @@ class PedidosEstadoPagoEnCarteraForm
             self::sectionDatosGenerales(),
             self::sectionResumen(),
             self::sectionComentarios(),
-            self::sectionDetalles(),
+            //self::sectionDetalles(),
             self::sectionAbonos()
         );
 

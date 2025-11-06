@@ -36,14 +36,14 @@
                     <div class="flex-grow pr-2 overflow-y-auto max-h-96">
                         @forelse($this->cart as $cartProduct)
                             <div
-                                class="flex items-center justify-between p-4 mb-4 bg-gray-50 dark:bg-neutral-700 rounded-xl shadow-sm">
+                                class="flex items-center justify-between p-2 mb-2 bg-gray-50 dark:bg-neutral-700 rounded-xl shadow-sm">
                                 <div class="flex-1">
                                     <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-100">
                                         {{ $cartProduct['nombre_producto'] }}
                                     </h4>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{--<p class="text-xs text-gray-500 dark:text-gray-400">
                                         SKU: {{ $cartProduct['codigo_producto'] }}
-                                    </p>
+                                    </p> --}}
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
                                         COP: {{ number_format($this->getPrecioProducto($cartProduct), 0) }}
 

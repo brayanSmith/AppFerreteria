@@ -78,11 +78,11 @@
 
   <!-- Información general centrada -->
 <div style="text-align: center; margin-bottom: 10px;">
-  <div class="bold" style="font-size: 24px;">DISTRIGUERRERO</div>
+  <div class="bold" style="font-size: 24px;">{{ $empresa->nombre_empresa ?? 'DISTRIGUERRERO' }}</div>
   <div>Distribuidora de Ferreterías</div>
-  <div>CALLE 7 NUMERO 5-63</div>
-  <div>3105568244</div>
-  <div>1087644203-1</div>
+  <div>{{ $empresa->direccion_empresa ?? 'CALLE 7 NUMERO 5-63' }}</div>
+  <div>{{ $empresa->telefono_empresa ?? '3105568244' }}</div> 
+  <div>{{ $empresa->nit_empresa ?? '1087644203-1' }}</div>
 </div>
 
 <!-- Línea con REMISIÓN a la izquierda y FECHA DE VENCIMIENTO a la derecha -->
