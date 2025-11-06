@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Filament\Resources\ComprasFacturadas\Pages;
-
+ 
 use App\Filament\Resources\ComprasFacturadas\ComprasFacturadasResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+
+use App\Filament\Exports\CompraExporter;
+use Filament\Actions\ExportAction;
 
 class ListComprasFacturadas extends ListRecords
 {
@@ -14,6 +17,10 @@ class ListComprasFacturadas extends ListRecords
     {
         return [
             CreateAction::make(),
+            ExportAction::make()
+            ->exporter(CompraExporter::class),
+
+            
         ];
     }
 }
