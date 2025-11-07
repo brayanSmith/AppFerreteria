@@ -40,13 +40,20 @@ class EmpresaResource extends Resource
                 TextInput::make('email_empresa')
                     ->maxLength(255),
                 TextInput::make('nit_empresa')
-                    ->maxLength(255),
+                    ->maxLength(255),                
+
                 FileUpload::make('logo_empresa')
+                    ->label('Seleccione una imagen')
                     ->image()
-                    ->maxSize(1024)
                     ->directory('logos_empresas')
-                    ->nullable(),
-            ]);
+                    ->disk('public')
+                    ->imageEditor()
+                    ->downloadable()
+                    ->openable()
+                    ->nullable()
+                    ->maxSize(1024) // 1MB
+                    ->default(null),
+            ]); 
     }
 
     public static function table(Table $table): Table
@@ -56,6 +63,7 @@ class EmpresaResource extends Resource
             ->columns([
                 ImageColumn::make('logo_empresa')
                     ->label('Logo')
+                    ->disk('public')
                     ->circular()
                     ->size(50),
                 TextColumn::make('nombre_empresa')
