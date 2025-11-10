@@ -28,8 +28,7 @@ class Pedido extends Model
         'en_cartera',
         'abono',
         'descuento',
-        'flete',
-        'iva',
+        'flete',        
         'total_a_pagar',
         'contador_impresiones',
         'impresa',
@@ -101,7 +100,7 @@ class Pedido extends Model
         $abonos = $this->abonoPedido()->sum('monto') ?? 0;
 
         $subtotal = (float) ($this->subtotal ?? 0);
-        $descuento = (float) ($this->descuento ?? 0);
+        $descuento = (float) ($this->descuento ?? 0); 
 
     $calculated = $subtotal - $descuento - $abonos;
     $this->total_a_pagar = $calculated < 0 ? 0 : $calculated;

@@ -347,7 +347,8 @@ trait HasPedidoSections
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     // recalcula solo con el precio unitario proporcionado por el usuario
                                     self::recalcularDesdePrecioManual($set, $get);
-                                })                              
+                                }) 
+                                                             
                                 
                                 ->columnSpan(1),
 

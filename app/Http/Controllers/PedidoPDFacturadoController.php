@@ -31,7 +31,7 @@ class PedidoPDFacturadoController extends Controller
         $pdf = Pdf::loadView('pdf.pedidoFacturado', [
             'pedido'   => $pedido,
             'cliente'  => $pedido->cliente,
-            'detalles' => $pedido->detalles,
+            'detalles' => $pedido->detalles, 
             'empresa'  => $empresa,
         ]);
 

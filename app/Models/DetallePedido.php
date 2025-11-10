@@ -33,7 +33,15 @@ class DetallePedido extends Model
      */
     public function recalcularSubtotal(): void
     {
-        $this->subtotal = ($this->cantidad ?? 0) * ($this->precio_unitario ?? 0);
+        $cantidad = $this->cantidad ?? 0;
+        $precioUnitario = $this->precio_unitario ?? 0;
+        $ivaPercentage = $this->iva ?? 0;
+        
+        // Calcular el factor del IVA (ej: si iva = 19, factor = 1.19)
+        $factorIva = ($ivaPercentage / 100) + 1;
+        
+        // Subtotal = Cantidad * (Precio unitario * factor IVA)
+        $this->subtotal = $cantidad * ($precioUnitario * $factorIva);
 
         // importante: no dispares eventos infinitos
         $this->saveQuietly();
@@ -43,7 +51,15 @@ class DetallePedido extends Model
     {
         // cada vez que se cree o actualice un detalle
         static::saving(function (DetallePedido $detalle) {
-            $detalle->subtotal = ($detalle->cantidad ?? 0) * ($detalle->precio_unitario ?? 0);
+            $cantidad = $detalle->cantidad ?? 0;
+            $precioUnitario = $detalle->precio_unitario ?? 0;
+            $ivaPercentage = $detalle->iva ?? 0;
+            
+            // Calcular el factor del IVA (ej: si iva = 19, factor = 1.19)
+            $factorIva = ($ivaPercentage / 100) + 1;
+            
+            // Subtotal = Cantidad * (Precio unitario * factor IVA)
+            $detalle->subtotal = $cantidad * ($precioUnitario * $factorIva);
         });
 
         static::saved(function (DetallePedido $detalle) {

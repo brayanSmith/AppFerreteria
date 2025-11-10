@@ -40,6 +40,7 @@ class POS extends Component
     public $metodo_pago = "CREDITO";
     public $tipo_precio = "FERRETERO";
     public $tipo_venta = "REMISIONADA";
+    public $iva = 0;
 
     public $valor_producto = 0;
     // Comentarios
@@ -279,8 +280,21 @@ class POS extends Component
     #[Computed]
     public function subtotal()
     {
+        // Subtotal CON IVA para mostrar en pantalla
         $subtotalProductos = collect($this->cart)->sum(function ($producto) {
-            return $this->getPrecioProducto($producto) * $producto['cantidad'];
+            return $this->getPrecioProducto($producto, true) * $producto['cantidad'];
+        });
+        
+        return $subtotalProductos + $this->flete;
+    }
+    
+    /**
+     * Calcula el subtotal SIN IVA para guardar en la base de datos
+     */
+    private function subtotalSinIva()
+    {
+        $subtotalProductos = collect($this->cart)->sum(function ($producto) {
+            return $this->getPrecioProducto($producto, false) * $producto['cantidad'];
         });
         
         return $subtotalProductos + $this->flete;
@@ -318,13 +332,17 @@ class POS extends Component
                     ->send();
                 return;
             }
+            // Agregar nuevo producto al carrito (precios originales sin IVA)
             $this->cart[$productoId]  = [
                 'id' => $producto->id,
+                //Se agrega el id del producto
                 'nombre_producto' => $producto->nombre_producto,
                 'codigo_producto' => $producto->codigo_producto,
+
                 'valor_detal_producto' => $producto->valor_detal_producto,
                 'valor_ferretero_producto' => $producto->valor_ferretero_producto,
                 'valor_mayorista_producto' => $producto->valor_mayorista_producto,
+                'iva_producto' => $producto->iva_producto,
                 'imagen_producto' => $producto->imagen_producto,
                 'cantidad' => $cantidad,
             ];
@@ -391,7 +409,7 @@ class POS extends Component
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
                 'flete' => $this->flete,
-                'subtotal' => $this->subtotal(),
+                'subtotal' => $this->subtotalSinIva(), // Guardar subtotal SIN IVA
                 //'ciudad' => $this->ciudad,
                 'ciudad' => $this->ciudadSeleccionada,
                 //vamos a hacer que la fecha de vencimiento sea 30 dias despues de la fecha actual
@@ -403,14 +421,16 @@ class POS extends Component
             //Crear Productos Vendidos
 
             foreach ($this->cart as $producto) {
-                $precio_unitario = $this->getPrecioProducto($producto);
-                $subtotal = $precio_unitario * $producto['cantidad'];
+                $precio_unitario = $this->getPrecioProducto($producto, false); // Sin IVA para guardar en BD
+                $ivaProducto = $producto['iva_producto'] ?? 0;
+                
                 DetallePedido::create([
                     'pedido_id' => $pedido->id,
                     'producto_id' => $producto['id'],
                     'cantidad' => $producto['cantidad'],
                     'precio_unitario' => $precio_unitario,
-                    'subtotal' => $subtotal,
+                    'iva' => $ivaProducto, // Guardamos el porcentaje de IVA (ej: 19 para 19%)
+                    // El subtotal se calculará automáticamente en el modelo como: cantidad * (precio_unitario * factor_iva)
 
                 ]);
 
@@ -462,17 +482,31 @@ class POS extends Component
         }
     }
 
-    public function getPrecioProducto($producto)
+    public function getPrecioProducto($producto, $conIva = true)
     {
+        $precioBase = 0;
+        $ivaProducto = $producto['iva_producto'] ?? 0;
+        
         switch ($this->tipo_precio) {
             case 'FERRETERO':
-                return $producto['valor_ferretero_producto'];
+                $precioBase = $producto['valor_ferretero_producto'];
+                break;
             case 'MAYORISTA':
-                return $producto['valor_mayorista_producto'];
+                $precioBase = $producto['valor_mayorista_producto'];
+                break;
             case 'DETAL':
             default:
-                return $producto['valor_detal_producto'];
+                $precioBase = $producto['valor_detal_producto'];
+                break;
         }
+        
+        // Aplicar IVA solo si se solicita (para mostrar en pantalla)
+        if ($conIva) {
+            return $precioBase * ($ivaProducto / 100 + 1);
+        }
+        
+        // Retornar precio sin IVA (para guardar en BD)
+        return $precioBase;
     }
 
     public function render()

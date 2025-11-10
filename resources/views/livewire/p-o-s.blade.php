@@ -330,11 +330,13 @@
                                         <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-1">SKU:
                                             {{ $product->codigo_producto }}</p>
                                         <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-100 mt-1">DETAL:
-                                            {{ number_format($product->valor_detal_producto, 0) }}</p>
+                                            {{ number_format($product->valor_detal_producto * (($product->iva_producto / 100) + 1), 0) }}</p>
                                         <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-100 mt-1">FERRETERO:
-                                            {{ number_format($product->valor_ferretero_producto, 0) }}</p>
+                                            {{ number_format($product->valor_ferretero_producto * (($product->iva_producto / 100) + 1), 0) }}</p>
                                         <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-100 mt-1">MAYORISTA:
-                                            {{ number_format($product->valor_mayorista_producto, 0) }}</p>
+                                            {{ number_format($product->valor_mayorista_producto * (($product->iva_producto / 100) + 1), 0) }}</p>
+                                        {{-- <p class="text-[10px] md:text-xs text-gray-800 dark:text-gray-100 mt-1">IVA:
+                                            {{ $product->iva_producto }}%</p> --}}
                                     </div>
 
                                     <!-- Botón -->
