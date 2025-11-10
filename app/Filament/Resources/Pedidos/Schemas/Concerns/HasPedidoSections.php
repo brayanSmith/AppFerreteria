@@ -300,7 +300,12 @@ trait HasPedidoSections
                             $data['producto_id'] = isset($data['producto_id']) ? (int) $data['producto_id'] : null;
                             $data['cantidad'] = isset($data['cantidad']) ? (float) $data['cantidad'] : 0;
                             $data['precio_unitario'] = isset($data['precio_unitario']) ? (float) $data['precio_unitario'] : 0;
-                            $data['subtotal'] = $data['cantidad'] * $data['precio_unitario'];
+                            $data['iva'] = isset($data['iva']) ? (float) $data['iva'] : 0;
+                            
+                            // Calcular subtotal con IVA incluido
+                            $precioConIva = $data['precio_unitario'] * (1 + ($data['iva'] / 100));
+                            $data['subtotal'] = $data['cantidad'] * $precioConIva;
+                            
                             if (isset($data['_remove_temp'])) unset($data['_remove_temp']);
                             return $data;
                         })
@@ -334,10 +339,15 @@ trait HasPedidoSections
                                 ->required()
                                 ->preload()
                                 ->reactive()
-                                ->afterStateHydrated(function ($state, $set) {
+                                ->afterStateHydrated(function ($state, $set, $get) {
                                     // al hidratar fila (editar existente) rellenar código
                                     $set('codigo_producto', $state ? optional(Producto::find($state))->codigo_producto : null);
-                                    $set('iva', $state ? optional(Producto::find($state))->iva_producto : null);
+                                    
+                                    // Solo asignar IVA por defecto si no existe un valor guardado
+                                    $ivaActual = $get('iva');
+                                    if (is_null($ivaActual) && $state) {
+                                        $set('iva', optional(Producto::find($state))->iva_producto);
+                                    }
                                 })
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     // recalcular precios/subtotales
@@ -348,9 +358,12 @@ trait HasPedidoSections
                                     if ($state) {
                                         $p = Producto::find($state);
                                         $codigo = $p?->codigo_producto ?? null;
+                                        
+                                        // Solo asignar IVA por defecto cuando se cambia a un producto nuevo
+                                        // (no cuando se está cargando un registro existente)
+                                        $set('iva', $p?->iva_producto ?? 0);
                                     }
                                     $set('codigo_producto', $codigo);
-                                    $set('iva', $state ? optional(Producto::find($state))->iva_producto : null);
                                 })
                                 ->columnSpan(2),
 
