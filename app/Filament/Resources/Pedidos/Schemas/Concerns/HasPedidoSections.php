@@ -215,11 +215,56 @@ trait HasPedidoSections
         return [
             Section::make('Resumen')
                 ->schema([
-                    TextInput::make('subtotal')->currencyMask(".", ",", 0)->prefix('$')->readOnly()->numeric(),
-                    TextInput::make('abono')->prefix('$')->currencyMask(".", ",", 0)->readOnly()->numeric(),
-                    TextInput::make('descuento')->prefix('$')->currencyMask(".", ",", 0)->numeric()->live(onBlur: true)->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
-                    TextInput::make('flete')->prefix('$')->currencyMask(".", ",", 0)->numeric()->live(onBlur: true)->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
-                    TextInput::make('total_a_pagar')->label('Total a pagar')->prefix('$')->currencyMask(".", ",", 0)->readOnly()->numeric(),
+                    TextInput::make('subtotal')
+                        ->currencyMask(".", ",", 0)
+                        ->prefix('$')
+                        ->readOnly()
+                        ->numeric()
+                        ->reactive(), // Hacer reactivo para que se actualice cuando cambien los detalles
+                    
+                    TextInput::make('abono')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->readOnly()
+                        ->numeric()
+                        ->reactive(),
+                    
+                    TextInput::make('descuento')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->numeric()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
+                    
+                    TextInput::make('flete')
+                        ->prefix('$')
+                        ->currencyMask(".", ",", 0)
+                        ->numeric()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn($state, $set, $get) => self::recalcularAbonos($set, $get)),
+                    
+                    \Filament\Forms\Components\Placeholder::make('total_a_pagar_display')
+                        ->label('Total a pagar')
+                        ->extraAttributes(['class' => 'text-lg font-semibold'])
+                        ->content(function ($get) {
+                            // Calcular el total a pagar dinámicamente
+                            $subtotal = (float) ($get('subtotal') ?? 0);
+                            $flete = (float) ($get('flete') ?? 0);
+                            $abono = (float) ($get('abono') ?? 0);
+                            $descuento = (float) ($get('descuento') ?? 0);
+                            $total = ($subtotal + $flete) - ($abono + $descuento);
+                            $totalFinal = $total < 0 ? 0 : $total;
+                            return '$' . number_format($totalFinal, 0, ',', '.');
+                        }),
+                    
+                    // Campo oculto para mantener el valor real del total a pagar
+                    TextInput::make('total_a_pagar')
+                        ->hidden()
+                        ->dehydrated(true)
+                        ->afterStateHydrated(function ($state, $set, $get) {
+                            // Recalcular al cargar el formulario
+                            self::recalcularAbonos($set, $get);
+                        }),
                 ])->columnSpan(1),
         ];
     }
@@ -361,6 +406,10 @@ trait HasPedidoSections
                                 ->columnSpan(1),
                         ])
                         ->addActionLabel('Añadir Producto')
+                        ->addAction(fn(\Filament\Actions\Action $action) => $action->after(function ($record, $set, $get) {
+                            // Recalcular cuando se agrega un nuevo producto
+                            self::recalcularAbonos($set, $get);
+                        }))
                         ->deleteAction(fn(\Filament\Actions\Action $action) => $action->after(function ($record, $set, $get) {
                             self::recalcularTodo($set, $get, $get('tipo_precio'));
                         })),
@@ -425,12 +474,18 @@ trait HasPedidoSections
             if (! $detalle['producto_id']) continue;
             $producto = Producto::find($detalle['producto_id']);
             if (! $producto) continue;
-            $precio = $producto->getPrecioPorTipo($tipoPrecio);
+            
+            // Obtener precio base según el tipo de precio
+            $precioBase = $producto->getPrecioPorTipo($tipoPrecio);
             $cantidad = $detalle['cantidad'] ?? 0;
             $iva = $detalle['iva'] ?? 0;
-            $precioConIva = $precio * (1 + ($iva / 100));
+            
+            // Calcular precio con IVA para el subtotal
+            $precioConIva = $precioBase * (1 + ($iva / 100));
             $subtotal = $cantidad * $precioConIva;
-            $set("detalles.$index.precio_unitario", $precioConIva);
+            
+            // Guardar precio base (sin IVA) y subtotal (con IVA)
+            $set("detalles.$index.precio_unitario", $precioBase);
             $set("detalles.$index.subtotal", $subtotal);
             $subtotalGeneral += $subtotal;
         }
@@ -465,27 +520,40 @@ trait HasPedidoSections
 
     private static function recalcularAbonos(callable $set, callable $get): void
     {
-        $paths = ['', '../../', '../../../'];
-        $basePath = null;
+        // Buscar el contexto correcto para los campos del pedido
+        $paths = ['', '../../', '../../../', '../../../../'];
+        $basePath = '';
+        
+        // Intentar encontrar el nivel correcto buscando diferentes campos
         foreach ($paths as $p) {
-            $maybe = $get($p . 'abonos');
-            if (!is_null($maybe)) {
+            if (!is_null($get($p . 'subtotal'))) {
                 $basePath = $p;
                 break;
             }
         }
-        if ($basePath === null) $basePath = '';
+        
         $abonos = $get($basePath . 'abonos') ?? [];
         $totalAbonos = collect($abonos)->sum(fn($abono) => (float) ($abono['monto'] ?? 0));
+        
+        // Actualizar campo abono acumulado
         $currentAbono = (float) ($get($basePath . 'abono') ?? 0);
-        if (round($currentAbono, 4) !== round($totalAbonos, 4)) $set($basePath . 'abono', $totalAbonos);
+        if (round($currentAbono, 4) !== round($totalAbonos, 4)) {
+            $set($basePath . 'abono', $totalAbonos);
+        }
+        
+        // Cálculo: Total a Pagar = (Subtotal + Flete) - (Abono + Descuento)
         $subtotal = (float) ($get($basePath . 'subtotal') ?? 0);
         $flete = (float) ($get($basePath . 'flete') ?? 0);
         $descuento = (float) ($get($basePath . 'descuento') ?? 0);
-        $totalAPagar = $subtotal + $flete - $totalAbonos - $descuento;
+        
+        $totalAPagar = ($subtotal + $flete) - ($totalAbonos + $descuento);
         $totalAPagar = $totalAPagar < 0 ? 0 : $totalAPagar;
+        
+        // Actualizar total a pagar si ha cambiado
         $currentTotal = (float) ($get($basePath . 'total_a_pagar') ?? 0);
-        if (round($currentTotal, 4) !== round($totalAPagar, 4)) $set($basePath . 'total_a_pagar', $totalAPagar);
+        if (round($currentTotal, 4) !== round($totalAPagar, 4)) {
+            $set($basePath . 'total_a_pagar', $totalAPagar);
+        }
     }
 
     private static function buscarCodigoProducto(int $productoId): string

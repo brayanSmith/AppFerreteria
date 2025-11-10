@@ -93,17 +93,20 @@ class Pedido extends Model
     /**
      * Recalcula y guarda el campo `total_a_pagar`.
      *
-     * Lógica: total_a_pagar = subtotal - descuento - abonos
+     * Lógica: total_a_pagar = (subtotal + flete) - (abonos + descuento)
      */
     public function recalcularTotalAPagar(): void
     {
         $abonos = $this->abonoPedido()->sum('monto') ?? 0;
 
         $subtotal = (float) ($this->subtotal ?? 0);
+        $flete = (float) ($this->flete ?? 0);
         $descuento = (float) ($this->descuento ?? 0); 
 
-    $calculated = $subtotal - $descuento - $abonos;
-    $this->total_a_pagar = $calculated < 0 ? 0 : $calculated;
+        // Total a Pagar = (Subtotal + Flete) - (Abono + Descuento)
+        $calculated = ($subtotal + $flete) - ($abonos + $descuento);
+        $this->total_a_pagar = $calculated < 0 ? 0 : $calculated;
+        
         // Guardamos también el acumulado de abonos en el campo `abono`
         $this->abono = $abonos;
 

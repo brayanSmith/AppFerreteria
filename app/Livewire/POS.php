@@ -290,6 +290,7 @@ class POS extends Component
     
     /**
      * Calcula el subtotal SIN IVA para guardar en la base de datos
+     * El flete se maneja por separado en el modelo Pedido
      */
     private function subtotalSinIva()
     {
@@ -297,7 +298,7 @@ class POS extends Component
             return $this->getPrecioProducto($producto, false) * $producto['cantidad'];
         });
         
-        return $subtotalProductos + $this->flete;
+        return $subtotalProductos; // Solo productos, sin flete
     }
 
 
