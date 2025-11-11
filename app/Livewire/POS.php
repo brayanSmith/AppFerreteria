@@ -40,6 +40,7 @@ class POS extends Component
     public $metodo_pago = "CREDITO";
     public $tipo_precio = "FERRETERO";
     public $tipo_venta = "REMISIONADA";
+    public $estado_venta = "VENTA";
     public $iva = 0;
 
     public $valor_producto = 0;
@@ -87,6 +88,7 @@ class POS extends Component
             $this->metodo_pago = $posData['metodo_pago'] ?? 'CREDITO';
             $this->tipo_precio = $posData['tipo_precio'] ?? 'FERRETERO';
             $this->tipo_venta = $posData['tipo_venta'] ?? 'REMISIONADA';
+            $this->estado_venta = $posData['estado_venta'] ?? 'VENTA';
             $this->primer_comentario = $posData['primer_comentario'] ?? '';
             $this->segundo_comentario = $posData['segundo_comentario'] ?? '';
             $this->flete = $posData['flete'] ?? 0;
@@ -109,6 +111,7 @@ class POS extends Component
             'metodo_pago' => $this->metodo_pago,
             'tipo_precio' => $this->tipo_precio,
             'tipo_venta' => $this->tipo_venta,
+            'estado_venta' => $this->estado_venta,
             'primer_comentario' => $this->primer_comentario,
             'segundo_comentario' => $this->segundo_comentario,
             'flete' => $this->flete,
@@ -133,6 +136,7 @@ class POS extends Component
         $this->metodo_pago = 'CREDITO';
         $this->tipo_precio = 'FERRETERO';
         $this->tipo_venta = 'REMISIONADA';
+        $this->estado_venta = 'VENTA';
         $this->primer_comentario = '';
         $this->segundo_comentario = '';
         $this->flete = 0;
@@ -407,6 +411,7 @@ class POS extends Component
                 'metodo_pago' => $this->metodo_pago,
                 'tipo_precio' => $this->tipo_precio,
                 'tipo_venta' => $this->tipo_venta,
+                'estado_venta' => $this->estado_venta,
                 'primer_comentario' => $this->primer_comentario,
                 'segundo_comentario' => $this->segundo_comentario,
                 'flete' => $this->flete,
@@ -451,6 +456,7 @@ class POS extends Component
             $this->metodo_pago = "CREDITO";
             $this->tipo_precio = "FERRETERO";
             $this->tipo_venta = "REMISIONADA";
+            $this->estado_venta = "VENTA";
             $this->primer_comentario = '';
             $this->segundo_comentario = '';
             $this->ciudadSeleccionada = '';

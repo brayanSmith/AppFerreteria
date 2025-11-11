@@ -176,6 +176,11 @@ trait HasPedidoSections
                         'ELECTRONICA' => 'Electrónica',
                     ])->required()->columnSpan(2),
 
+                    Select::make('estado_venta')->options([
+                        'VENTA' => 'Venta',
+                        'DEVOLUCION' => 'Devolución',
+                    ])->default('VENTA')->required()->columnSpan(2)->visible(fn($get) => $get('estado') === 'PENDIENTE'),
+
                     /*Select::make('bodega_id')
                         ->label('Bodega')
                         ->relationship('bodega', 'nombre_bodega')

@@ -22,6 +22,7 @@ class Pedido extends Model
         'metodo_pago',
         'tipo_precio',
         'tipo_venta',
+        'estado_venta',
         'primer_comentario',
         'segundo_comentario',
         'subtotal',
