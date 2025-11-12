@@ -319,7 +319,7 @@ trait HasPedidoSections
                             TableColumn::make('Producto')->markAsRequired()->width('200px'),
                             TableColumn::make('Cantidad')->markAsRequired()->width('100px'),
                             TableColumn::make('Precio Unitario')->markAsRequired()->width('100px'),
-                            TableColumn::make('IVA')->markAsRequired()->width('100px'),
+                            //TableColumn::make('IVA')->markAsRequired()->width('100px'),
                             TableColumn::make('Subtotal')->markAsRequired()->width('100px'),
                             TableColumn::make('Acciones')->width('10px'),
                         ])
@@ -397,23 +397,24 @@ trait HasPedidoSections
                                 })
                                 ->columnSpan(1),
 
-                            TextInput::make('iva')
+                            /*TextInput::make('iva')
                                 ->label('IVA')
                                 ->prefix('%')
                                 ->numeric()
                                 ->required()
+                                ->visible(false)
                                 ->live(onBlur: true) 
                                 /*->default(function ($get) {
                                     $producto = Producto::find($get('producto_id'));
                                     return $producto ? $producto->iva_producto : 0;
                                 })*/
-                                ->afterStateUpdated(function ($state, $set, $get) {
+                                /*->afterStateUpdated(function ($state, $set, $get) {
                                     // recalcula solo con el precio unitario proporcionado por el usuario
                                     self::recalcularDesdePrecioManual($set, $get);
                                 }) 
                                                              
                                 
-                                ->columnSpan(1),
+                                ->columnSpan(1),*/
 
                             TextInput::make('subtotal')
                                 ->prefix('$')
