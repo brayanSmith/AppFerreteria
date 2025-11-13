@@ -74,6 +74,7 @@
   
 
   <!-- Logo centrado -->
+
   <div style="text-align: center; margin-bottom: 40px;">
     @if($empresa && $empresa->logo_empresa)
         @php
